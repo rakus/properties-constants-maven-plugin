@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Properties Constants Maven Plugin">
+    <bannerLeft>
+        <name>Properties Constants Maven Plugin</name>
+    </bannerLeft>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.7</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+        </fluidoSkin>
+    </custom>
+
+    <body>
+        <head><![CDATA[
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $(".source").addClass("prettyprint");
+                    //$(".source").addClass("linenums");
+                    prettyPrint();
+                });
+            </script>]]>
+        </head>
+
+
+        <menu name="Overview">
+            <item name="Introduction" href="intro.html"/>
+            <item name="Goals" href="plugin-info.html"/>
+            <item name="Usage" href="usage.html"/>
+            <item name="Changelog" href="CHANGELOG.html"/>
+        </menu>
+        <menu ref="reports" inherit="top"/>
+    </body>
+</project>

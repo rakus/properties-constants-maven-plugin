@@ -1,0 +1,9 @@
+*~
+*.log
+.attach_*
+.project
+.classpath
+.checkstyle
+.settings/
+target/
+

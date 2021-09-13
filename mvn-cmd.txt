@@ -1,0 +1,17 @@
+
+Run build with integration tests and coverage and build the site:
+
+    mvn clean verify site -Pit,coverage
+
+Run IT only for IT-project "empty-key"
+
+    mvn clean verify site -Pit,coverage -Dinvoker.test=empty-key
+
+
+Show available dependency updates:
+
+    mvn versions:display-dependency-updates
+
+Show available plugin updates:
+
+    mvn versions:display-plugin-updates
