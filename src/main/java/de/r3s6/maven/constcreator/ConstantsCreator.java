@@ -157,7 +157,8 @@ public class ConstantsCreator extends AbstractMojo {
 
             final Set<GeneratorRequest> genRequests = new HashSet<>();
             for (final String propFile : scanner.getIncludedFiles()) {
-                final GeneratorRequest gr = new GeneratorRequest(basePackage, propFile, flattenPackage);
+                final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
+                        flattenPackage);
                 if (!genRequests.contains(gr)) {
                     genRequests.add(gr);
                 } else {
@@ -168,7 +169,8 @@ public class ConstantsCreator extends AbstractMojo {
             if (genRequests.isEmpty()) {
                 getLog().info("No properties files found - no Java classes to generate");
             } else {
-                getLog().info("Generating " + genRequests.size() + " Java constant classes");
+                getLog().info("Generating " + genRequests.size() + " Java constant class"
+                        + (genRequests.size() == 1 ? "" : "es"));
             }
 
             for (final GeneratorRequest genReq : genRequests) {
@@ -183,7 +185,7 @@ public class ConstantsCreator extends AbstractMojo {
 
     private void createConstants(final GeneratorRequest genReq) throws MojoExecutionException {
 
-        final File propFile = new File(resourceDir, genReq.getPropertiesFileName());
+        final File propFile = genReq.getPropertiesFile();
 
         buildContext.removeMessages(propFile);
 
@@ -212,15 +214,15 @@ public class ConstantsCreator extends AbstractMojo {
             throw new MojoExecutionException("File contains entry with empty key: " + genReq.getPropertiesFileName());
         }
 
-        final File javaFile = new File(outputDir, genReq.getJavaFileName());
+        final File javaFile = genReq.getJavaFile();
 
         javaFile.getParentFile().mkdirs();
 
         try {
             createStringConstants(genReq, entries, javaFile);
         } catch (final IOException e) {
-            buildContext.addMessage(propFile, 1, 1, "Error generating Java file " + genReq.getJavaFileName(),
-                    BuildContext.SEVERITY_ERROR, e);
+            buildContext.addMessage(genReq.getPropertiesFile(), 1, 1,
+                    "Error generating Java file " + genReq.getJavaFileName(), BuildContext.SEVERITY_ERROR, e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }

@@ -1,5 +1,6 @@
 package de.r3s6.maven.constcreator;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,9 +28,19 @@ final class GeneratorRequest {
     /** Simple class name (without package). */
     private final String className;
 
+    /** The java output file name, relative to the output directory. */
+    private final String javaFilename;
+
+    /** the java output file. */
+    private final File javaFile;
+
     /** File name of the property (relative to search dir). */
     private final String propertyFileName;
 
+    /** The properties file. */
+    private final File propertiesFile;
+
+    /** Whether the properties file is a xml file. */
     private final boolean xmlProperties;
 
     /**
@@ -37,7 +48,8 @@ final class GeneratorRequest {
      */
     private final String propertyBasename;
 
-    GeneratorRequest(final String pkgName, final String propFileName, final boolean flatten) {
+    GeneratorRequest(final File resourceDir, final File outputDir, final String pkgName, final String propFileName,
+            final boolean flatten) {
 
         this.propertyFileName = propFileName;
 
@@ -85,6 +97,11 @@ final class GeneratorRequest {
         this.className = cName;
         this.fullClassName = pName + "." + cName;
 
+        this.javaFilename = this.fullClassName.replace('.', '/') + ".java";
+
+        this.propertiesFile = new File(resourceDir, this.propertyFileName);
+        this.javaFile = new File(outputDir, getJavaFileName());
+
     }
 
     @Override
@@ -119,9 +136,26 @@ final class GeneratorRequest {
         return fullClassName;
     }
 
+    /**
+     * File name of Java file relative to output folder.
+     */
+    String getJavaFileName() {
+        return javaFilename;
+    }
+
+    /** The java output file. */
+    public File getJavaFile() {
+        return javaFile;
+    }
+
     /** Name of the properties file relative to search dir. */
     public String getPropertiesFileName() {
         return propertyFileName;
+    }
+
+    /** The properties input file. */
+    public File getPropertiesFile() {
+        return propertiesFile;
     }
 
     /**
@@ -131,13 +165,6 @@ final class GeneratorRequest {
      */
     public String getPropertiesBasename() {
         return propertyBasename;
-    }
-
-    /**
-     * File name of Java file relative to source folder.
-     */
-    String getJavaFileName() {
-        return getFullClassName().replace('.', '/') + ".java";
     }
 
     public boolean isXmlProperties() {
