@@ -3,19 +3,19 @@ package de.r3s6.maven.constcreator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -143,28 +143,18 @@ public class ConstantsCreator extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean genBundleLoader;
 
+    private List<String> errorMessages = new ArrayList<>();
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
-            if (basePackage.trim().isEmpty()) {
+            if (basePackage == null || basePackage.trim().isEmpty()) {
                 throw new MojoExecutionException("Empty basePackage configure - not supported");
             }
 
-            final Scanner scanner = buildContext.newScanner(resourceDir);
-            scanner.setIncludes(includes);
-            scanner.setExcludes(excludes);
-            scanner.scan();
+            cleanupDeletes();
 
-            final Set<GeneratorRequest> genRequests = new HashSet<>();
-            for (final String propFile : scanner.getIncludedFiles()) {
-                final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
-                        flattenPackage);
-                if (!genRequests.contains(gr)) {
-                    genRequests.add(gr);
-                } else {
-                    throw new MojoExecutionException("Duplicate target class: " + gr.getFullClassName());
-                }
-            }
+            final Collection<GeneratorRequest> genRequests = scanProperties();
 
             if (genRequests.isEmpty()) {
                 getLog().info("No properties files found - no Java classes to generate");
@@ -181,37 +171,78 @@ public class ConstantsCreator extends AbstractMojo {
         }
 
         project.addCompileSourceRoot(outputDir.getPath());
+
+        if (!errorMessages.isEmpty()) {
+            throw new MojoExecutionException(errorMessages.stream().collect(Collectors.joining("\n")));
+        }
     }
 
-    private void createConstants(final GeneratorRequest genReq) throws MojoExecutionException {
+    /**
+     * Scan for properties files.
+     *
+     * @return Collection of GeneratorRequests
+     */
+    private Collection<GeneratorRequest> scanProperties() {
+        final Scanner scanner = buildContext.newScanner(resourceDir);
+        scanner.setIncludes(includes);
+        scanner.setExcludes(excludes);
+        scanner.scan();
+
+        final Map<String, GeneratorRequest> genRequests = new LinkedHashMap<>();
+        for (final String propFile : scanner.getIncludedFiles()) {
+            final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
+                    flattenPackage);
+            if (!genRequests.containsKey(gr.getFullClassName())) {
+                genRequests.put(gr.getFullClassName(), gr);
+            } else {
+                addError(gr.getPropertiesFile(), 1, 1, "Would creates same constant class " + gr.getFullClassName()
+                        + " as " + genRequests.get(gr.getFullClassName()).getPropertiesFileName());
+            }
+        }
+        return genRequests.values();
+    }
+
+    private void cleanupDeletes() {
+        final Scanner scanner = buildContext.newDeleteScanner(resourceDir);
+        scanner.setIncludes(includes);
+        scanner.setExcludes(excludes);
+        scanner.scan();
+
+        for (final String propFile : scanner.getIncludedFiles()) {
+            final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
+                    flattenPackage);
+            if (gr.getJavaFile().exists()) {
+                gr.getJavaFile().delete();
+                buildContext.refresh(gr.getJavaFile());
+            }
+        }
+    }
+
+    private void createConstants(final GeneratorRequest genReq) {
 
         final File propFile = genReq.getPropertiesFile();
 
         buildContext.removeMessages(propFile);
 
         final Map<String, String> entries = new LinkedHashMap<>();
-        try {
+        try (InputStream is = new FileInputStream(propFile)) {
             final Properties props = new OrderedProperties();
             if (genReq.isXmlProperties()) {
-                try (InputStream is = new FileInputStream(propFile)) {
-                    props.loadFromXML(is);
-                }
+                props.loadFromXML(is);
             } else {
-                try (Reader rdr = new FileReader(propFile)) {
-                    props.load(rdr);
-                }
+                props.load(is);
             }
             props.keySet().stream().forEach(k -> entries.put((String) k, props.getProperty((String) k)));
 
         } catch (final IOException e) {
-            buildContext.addMessage(propFile, 1, 1, "Error loading file", BuildContext.SEVERITY_ERROR, e);
-            throw new MojoExecutionException(e.getMessage(), e);
+
+            addError(propFile, 1, 1, "Error loading properties file: " + e.getMessage(), e);
+            return;
         }
 
         if (entries.containsKey("")) {
-            buildContext.addMessage(propFile, 1, 1, "File contains entry with empty key", BuildContext.SEVERITY_ERROR,
-                    null);
-            throw new MojoExecutionException("File contains entry with empty key: " + genReq.getPropertiesFileName());
+            addError(propFile, 1, 1, "File contains entry with empty key", null);
+            return;
         }
 
         final File javaFile = genReq.getJavaFile();
@@ -221,9 +252,7 @@ public class ConstantsCreator extends AbstractMojo {
         try {
             createStringConstants(genReq, entries, javaFile);
         } catch (final IOException e) {
-            buildContext.addMessage(genReq.getPropertiesFile(), 1, 1,
-                    "Error generating Java file " + genReq.getJavaFileName(), BuildContext.SEVERITY_ERROR, e);
-            throw new MojoExecutionException(e.getMessage(), e);
+            addError(genReq.getPropertiesFile(), 1, 1, "Error generating Java file " + genReq.getJavaFileName(), e);
         }
     }
 
@@ -254,7 +283,6 @@ public class ConstantsCreator extends AbstractMojo {
             pw.printf("public final class %s {%n", genRequest.getSimpleClassName());
             pw.println();
 
-            // DON'T USE ENTRYSET HERE - it's not sorted
             for (final Entry<String, String> entry : entries.entrySet()) {
                 final String k = entry.getKey();
                 final String v = entry.getValue();
@@ -346,6 +374,17 @@ public class ConstantsCreator extends AbstractMojo {
             pw.printf("}%n");
         }
         // CSON: MultipleString
+    }
+
+    private void addError(final File file, final int line, final int column, final String message) {
+        addError(file, line, column, message, null);
+    }
+
+    private void addError(final File file, final int line, final int column, final String message,
+            final Throwable thr) {
+
+        buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, thr);
+        errorMessages.add(String.format("%s[%d:%d] %s", file.getPath(), line, column, message));
     }
 
     /**
