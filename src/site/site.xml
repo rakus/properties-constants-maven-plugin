@@ -20,7 +20,7 @@
             <script type="text/javascript">
                 $(document).ready(function () {
                     $(".source").addClass("prettyprint");
-                    //$(".source").addClass("linenums");
+                    $(".source").addClass("linenums");
                     prettyPrint();
                 });
             </script>]]>
@@ -28,9 +28,10 @@
 
 
         <menu name="Overview">
-            <item name="Introduction" href="intro.html"/>
+            <item name="Introduction" href="index.html"/>
             <item name="Goals" href="plugin-info.html"/>
             <item name="Usage" href="usage.html"/>
+            <item name="FAQ" href="faq.html"/>
             <item name="Changelog" href="CHANGELOG.html"/>
         </menu>
         <menu ref="reports" inherit="top"/>

@@ -6,13 +6,16 @@
 
 $H1 ${project.name}
 
-This plug-in reads properties files and generates Java classes holding constants for
-the property keys.
+This plug-in reads properties files and generates Java classes holding
+constants for the property keys. It scans a given directory (default
+`src/main/resources`) for properties files and creates constants classes for
+all of them.
 
-The goal `generate` scans a given directory (default `src/main/resources`) for properties
-files and creates constants classes for all of them.
+If requested, the classes contain methods to load the properties file as
+`ResourceBundle` or `Properties`.
 
-If requested, the classes contain methods to load the properties file as `ResourceBundle` or `Properties`.
+In Eclipse the plugin goal `generate` is used as a build participant and runs on
+incremental and clean builds.
 
 $H2 Example
 
@@ -157,8 +160,7 @@ __Examples__
 | 0test         | _0TEST        |
 
 
-
-
-
 ---
-The plugin requires **Maven ${project.prerequisites.maven}** or later and **Java 8** or later.
+The plugin requires **Maven ${project.prerequisites.maven}** or later and
+**Java 8** or later.
+
