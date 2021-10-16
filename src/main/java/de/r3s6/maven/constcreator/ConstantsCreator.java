@@ -17,6 +17,8 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.lang.model.SourceVersion;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -148,8 +150,8 @@ public class ConstantsCreator extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
-            if (basePackage == null || basePackage.trim().isEmpty()) {
-                throw new MojoExecutionException("Empty basePackage configure - not supported");
+            if (!isValidPackageName(basePackage)) {
+                throw new MojoExecutionException("Configures basePackage \"" + basePackage + "\" is invalid.");
             }
 
             cleanupDeletes();
@@ -418,6 +420,28 @@ public class ConstantsCreator extends AbstractMojo {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Checks whether the given name is a valid package name.
+     *
+     * @param pkgName the name to check
+     * @return whether the given name is a valid package name
+     */
+    static boolean isValidPackageName(final String pkgName) {
+        if (pkgName == null || pkgName.trim().isEmpty()) {
+            return false;
+        }
+
+        final String[] parts = pkgName.split("\\.");
+
+        for (final String p : parts) {
+            if (!SourceVersion.isName(p)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
