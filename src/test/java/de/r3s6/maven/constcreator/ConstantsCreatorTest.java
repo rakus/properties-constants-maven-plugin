@@ -29,7 +29,13 @@ class ConstantsCreatorTest {
 
         assertEquals("TEST_CASE_MESSAGE", ConstantsCreator.keyToConstant("test.case.message"));
 
+        assertEquals("TEST$CASE", ConstantsCreator.keyToConstant("test$case"));
+
+        assertEquals("ÄÖÜ_ÄÖÜSS", ConstantsCreator.keyToConstant("ÄÖÜ_äöüß"));
+
         assertEquals("_0ZERO", ConstantsCreator.keyToConstant("0zero"));
+
+        assertEquals("_PERCENT", ConstantsCreator.keyToConstant("%percent"));
 
     }
 
