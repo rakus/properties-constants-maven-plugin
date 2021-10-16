@@ -2,6 +2,7 @@ package de.r3s6.maven.constcreator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -109,6 +110,19 @@ class GeneratorRequestTest {
         assertEquals("pkg/test/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test.xml", gr.getPropertiesFile().getPath());
         assertEquals("output-dir/pkg/test/Test.java", gr.getJavaFile().getPath());
+    }
+
+    @Test
+    void testInvalidConstruction() {
+
+        assertThrows(NullPointerException.class, () -> new GeneratorRequest(null, OUT, "pkg", "test/test.xml", false));
+        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, null, "pkg", "test/test.xml", false));
+        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, null, "test/test.xml", false));
+        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, "pkg", null, false));
+        assertThrows(IllegalArgumentException.class, () -> new GeneratorRequest(IN, OUT, "", "test/test.xml", false));
+        assertThrows(IllegalArgumentException.class,
+                () -> new GeneratorRequest(IN, OUT, "   ", "test/test.xml", false));
+
     }
 
 }

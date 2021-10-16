@@ -1,6 +1,7 @@
 package de.r3s6.maven.constcreator;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +51,14 @@ final class GeneratorRequest {
 
     GeneratorRequest(final File resourceDir, final File outputDir, final String pkgName, final String propFileName,
             final boolean flatten) {
+        Objects.requireNonNull(resourceDir);
+        Objects.requireNonNull(outputDir);
+        Objects.requireNonNull(pkgName);
+        Objects.requireNonNull(propFileName);
+
+        if (pkgName.trim().length() == 0) {
+            throw new IllegalArgumentException("Empty package name not supported");
+        }
 
         this.propertyFileName = propFileName;
 
@@ -66,18 +75,9 @@ final class GeneratorRequest {
             fqName = (pkgName + "." + propertyBasename).replaceAll("[\\/]", ".");
         }
 
-        String pName;
-        String cName;
-
         final int lastDotIdx = fqName.lastIndexOf('.');
-        if (lastDotIdx >= 0) {
-            pName = fqName.substring(0, lastDotIdx);
-            cName = fqName.substring(lastDotIdx + 1);
-        } else {
-            // This would be the default package -- should never happen
-            pName = "";
-            cName = fqName;
-        }
+        String pName = fqName.substring(0, lastDotIdx);
+        String cName = fqName.substring(lastDotIdx + 1);
 
         // clean package name
         pName = pName.replaceAll("-", "");
