@@ -33,6 +33,8 @@
 
         <!-- don't lookup dependencies for project-info-report. Speeds up build. -->
         <dependency.locations.enabled>false</dependency.locations.enabled>
+
+        <surefire.jacoco></surefire.jacoco>
     </properties>
 
     <developers>
@@ -176,6 +178,9 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M4</version>
+                <configuration>
+                    <argLine>@{surefire.jacoco}</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -352,6 +357,24 @@
                         <version>0.8.6</version>
                         <executions>
                             <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${coverage.file}</destFile>
+                                    <!-- set maven-invoker-plugin property -->
+                                    <propertyName>surefire.jacoco</propertyName>
+                                    <append>true</append>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                            <execution>
                                 <id>pre-integration-test</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
@@ -389,7 +412,7 @@
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <configuration>
-                            <title>${project.name} - Integration Tests</title>
+                            <title>${project.name} - Unit &amp; Integration Tests</title>
                             <dataFile>${coverage.file}</dataFile>
                             <excludes>
                                 <exclude>**/HelpMojo.*</exclude>
@@ -398,8 +421,8 @@
                         <reportSets>
                             <reportSet>
                                 <reports>
-                                    <!-- select non-aggregate reports -->
-                                    <report>report-integration</report>
+                                    <!-- report-aggregate, report-integration, report -->
+                                    <report>report</report>
                                 </reports>
                             </reportSet>
                         </reportSets>

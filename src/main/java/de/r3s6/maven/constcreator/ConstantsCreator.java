@@ -170,9 +170,13 @@ public class ConstantsCreator extends AbstractMojo {
                         + genReq.getFullClassName());
                 createConstants(genReq);
             }
+        } else {
+            getLog().info("Skipped - skip == true");
         }
 
-        project.addCompileSourceRoot(outputDir.getPath());
+        if (outputDir.isDirectory()) {
+            project.addCompileSourceRoot(outputDir.getPath());
+        }
 
         if (!errorMessages.isEmpty()) {
             throw new MojoExecutionException(errorMessages.stream().collect(Collectors.joining("\n")));
