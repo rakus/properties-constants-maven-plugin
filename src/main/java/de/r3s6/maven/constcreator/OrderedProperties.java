@@ -12,6 +12,8 @@ import org.apache.commons.lang3.NotImplementedException;
 /**
  * Thin wrapper around {@link Properties} to keep insert order.
  * <p>
+ * Only used for reading properties.
+ * <p>
  * <b>WARNING</b>: This is just enough for the usage in this maven plugin.
  *
  * @author Ralf Schandl

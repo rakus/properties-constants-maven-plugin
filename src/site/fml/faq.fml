@@ -16,7 +16,7 @@
                 <p>Yes, if the configuration also includes <tt>*.xml</tt> files, those files
                 are read using <tt>Properties.loadFromXml()</tt>.</p>
                 <p>If a constant class is created from an XML file, the loader method
-                <tt>loadProperties()</tt> also loads that XML file.</p>
+                <tt>loadProperties()</tt> also uses <tt>loadFromXml()</tt>.</p>
                 <p>To include XML files use the configuration option <tt>&lt;includes&gt;</tt>
                 like:
                 </p>
@@ -77,7 +77,7 @@
                 </p>
                 <p>E.g.the simple smiley &#x263A; can be added with <tt>\u263A</tt>.</p>
                 <p>Depending on your use case, a XML properties file might be better. See above.</p>
-                <p>Beginning with Java9 for <tt>ResourceBundle</tt>s the character set can be
+                <p>Beginning with Java9 the character set for <tt>ResourceBundle</tt>s can be
                 UTF-8. See the javadoc of <tt>java.util.PropertyResourceBundle</tt>.</p>
             </answer>
         </faq>
