@@ -1,6 +1,11 @@
-# Usage
+## Double hash is a velocity comment -- bad for markdown
+#set($H1 = '#')
+#set($H2 = '##')
+#set($H3 = '###')
 
-## Project Directories
+$H1 Usage
+
+$H2 Project Directories
 
 The following diagram shows the default layout used by the properties-constants-maven-plugin
 
@@ -13,7 +18,7 @@ The following diagram shows the default layout used by the properties-constants-
           +- generated-sources/prop-constants
                                        # directory to store generated java files
 
-## Simple properties
+$H2 Simple properties
 
 Reads `*.properties` files from `src/main/resources` and generates Java classes
 in the package `de.r3s6.constants`. Support methods for Properties are generated.
@@ -22,14 +27,10 @@ in the package `de.r3s6.constants`. Support methods for Properties are generated
 <build>
     <plugins>
         <plugin>
-            <groupId>de.r3s6.maven</groupId>
-            <artifactId>properties-constants-maven-plugin</artifactId>
-            <version>0.1.0</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
             <configuration>
-                <resourceDir>src/main/resources</resourceDir>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
                 <basePackage>de.r3s6.constants</basePackage>
                 <genGetPropertiesFilename>true</genGetPropertiesFilename>
                 <genPropertiesLoader>true</genPropertiesLoader>
@@ -48,7 +49,7 @@ in the package `de.r3s6.constants`. Support methods for Properties are generated
 ```
 
 
-## I18N - ResourceBundle
+$H2 I18N - ResourceBundle
 
 Reads ResourceBundle properties files from `src/main/resources/i18n`. It ignores
 files with a locale marker (like `messages_en.properties`). Support methods for
@@ -58,18 +59,17 @@ ResourceBundles are generated.
 <build>
     <plugins>
         <plugin>
-            <groupId>de.r3s6.maven</groupId>
-            <artifactId>properties-constants-maven-plugin</artifactId>
-            <version>0.1.0</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
             <configuration>
-                <resourceDir>src/main/resources/i18n</resourceDir>
+                <basePackage>de.r3s6.constants.i18n</basePackage>
                 <includes>
-                    <include>*.properties</include>
+                    <include>i18n/*.properties</include>
                 </includes>
                 <excludes>
-                    <exclude>*_??.properties</exclude>
+                    <exclude>i18n/*_??.properties</exclude>
                 </excludes>
-                <basePackage>de.r3s6.constants.i18n</basePackage>
                 <genGetBundleName>true</genGetBundleName>
                 <genBundleLoader>true</genBundleLoader>
             </configuration>
