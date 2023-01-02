@@ -201,7 +201,7 @@ public class ConstantsCreator extends AbstractMojo {
             if (!genRequests.containsKey(gr.getFullClassName())) {
                 genRequests.put(gr.getFullClassName(), gr);
             } else {
-                addError(gr.getPropertiesFile(), 1, 1, "Would creates same constant class " + gr.getFullClassName()
+                addError(gr.getPropertiesFile(), 0, 0, "Would create same constant class " + gr.getFullClassName()
                         + " as " + genRequests.get(gr.getFullClassName()).getPropertiesFileName());
             }
         }
@@ -242,12 +242,12 @@ public class ConstantsCreator extends AbstractMojo {
 
         } catch (final IOException e) {
 
-            addError(propFile, 1, 1, "Error loading properties file: " + e.getMessage(), e);
+            addError(propFile, 0, 0, "Error loading properties file: " + e.getMessage(), e);
             return;
         }
 
         if (entries.containsKey("")) {
-            addError(propFile, 1, 1, "File contains entry with empty key", null);
+            addError(propFile, 0, 0, "File contains entry with empty key", null);
             return;
         }
 
@@ -258,7 +258,7 @@ public class ConstantsCreator extends AbstractMojo {
         try {
             createStringConstants(genReq, entries, javaFile);
         } catch (final IOException e) {
-            addError(genReq.getPropertiesFile(), 1, 1, "Error generating Java file " + genReq.getJavaFileName(), e);
+            addError(genReq.getPropertiesFile(), 0, 0, "Error generating Java file " + genReq.getJavaFileName(), e);
         }
     }
 
