@@ -97,8 +97,8 @@ public class ConstantsCreator extends AbstractMojo {
      * directory structure.
      * <p>
      * By default the constants Java classes of properties files located in
-     * sub-directories of {@code resourceDir} will be put in sub-packages of
-     * {@code basePackage}.
+     * sub-directories of {@code resourceDir} will be put in a matching sub-packages
+     * of {@code basePackage}.
      * <p>
      * If {@code flattenPackage} is true, all classes will end up in
      * {@code basePackage}. Note that this might lead to name collisions.
@@ -310,7 +310,7 @@ public class ConstantsCreator extends AbstractMojo {
                 pw.printf("     * Returns the bundle name - this is the properties file name%n");
                 pw.printf("     * used to generate this class excluding extension and locale part.%n");
                 pw.printf("     * %n");
-                pw.printf("     * @returns always \"%s\"%n", genRequest.getPropertiesBasename());
+                pw.printf("     * @return always \"%s\"%n", genRequest.getPropertiesBasename());
                 pw.printf("     */%n");
                 pw.printf("    public static String getBundleName() {%n");
                 pw.printf("        return \"%s\";%n", genRequest.getPropertiesBasename());
@@ -322,7 +322,8 @@ public class ConstantsCreator extends AbstractMojo {
                 pw.printf("    /**%n");
                 pw.printf("     * Loads the resource bundle \"%s\" for the default locale.%n",
                         genRequest.getPropertiesBasename());
-                pw.printf("     * @returns the loaded bundle%n");
+                pw.printf("     * @return the loaded bundle%n");
+                pw.printf("     * @throws MissingResourceException if bundle couldn't be found%n");
                 pw.printf("     */%n");
                 pw.printf("    public static ResourceBundle loadBundle() {%n");
                 pw.printf("        return ResourceBundle.getBundle(\"%s\");%n", genRequest.getPropertiesBasename());
@@ -333,7 +334,9 @@ public class ConstantsCreator extends AbstractMojo {
                 pw.printf("     * Loads the resource bundle \"%s\" for the given locale.%n",
                         genRequest.getPropertiesBasename());
                 pw.printf("     * @param locale the locale to use%n");
-                pw.printf("     * @returns the loaded bundle%n");
+                pw.printf("     * @return the loaded bundle%n");
+                pw.printf("     * @throws MissingResourceException if bundle couldn't be found%n");
+                pw.printf("     * @throws NullPointerException if locale is null%n");
                 pw.printf("     */%n");
                 pw.printf("    public static ResourceBundle loadBundle(final Locale locale) {%n");
                 pw.printf("        return ResourceBundle.getBundle(\"%s\", locale);%n",
@@ -347,7 +350,7 @@ public class ConstantsCreator extends AbstractMojo {
                 pw.printf("     * Returns the filename of the properties file used to generate%n");
                 pw.printf("     * this class.%n");
                 pw.printf("     * %n");
-                pw.printf("     * @returns always \"%s\"%n", genRequest.getPropertiesFileName());
+                pw.printf("     * @return always \"%s\"%n", genRequest.getPropertiesFileName());
                 pw.printf("     */%n");
                 pw.printf("    public static String getPropertiesFilename() {%n");
                 pw.printf("        return \"%s\";%n", genRequest.getPropertiesFileName());
@@ -359,13 +362,17 @@ public class ConstantsCreator extends AbstractMojo {
                 pw.printf("    /**%n");
                 pw.printf("     * Loads the properties file \"/%s\" from the classpath.%n",
                         genRequest.getPropertiesFileName());
-                pw.printf("     * @returns the loaded properties%n");
-                pw.printf("     * @throws IOException on load problems%n");
+                pw.printf("     * @return the loaded properties%n");
+                pw.printf("     * @throws IOException if properties file not found or on load problems%n");
                 pw.printf("     */%n");
                 pw.printf("    public static Properties loadProperties() throws IOException {%n");
                 pw.printf("        final Properties properties = new Properties();%n");
                 pw.printf("        try (final InputStream stream = %s.class.getResourceAsStream(\"/%s\")) {%n",
                         genRequest.getSimpleClassName(), genRequest.getPropertiesFileName());
+                pw.printf("            if(stream == null) {%n");
+                pw.printf("                throw new IOException(\"Resource not found: %s\");%n",
+                        genRequest.getPropertiesFileName());
+                pw.printf("            }%n");
                 if (genRequest.isXmlProperties()) {
                     pw.printf("            properties.loadFromXML(stream);%n");
                 } else {
