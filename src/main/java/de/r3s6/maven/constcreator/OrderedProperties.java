@@ -7,8 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 /**
  * Thin wrapper around {@link Properties} to keep insert order.
  * <p>
@@ -43,7 +41,7 @@ public class OrderedProperties extends Properties {
 
     @Override
     public Set<java.util.Map.Entry<Object, Object>> entrySet() {
-        throw new NotImplementedException("entrySet() not implemented. Use keySet()");
+        throw new UnsupportedOperationException("entrySet() not implemented. Use keySet()");
     }
 
     // Will never be used in our scenario

@@ -11,7 +11,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 
 class OrderedPropertiesTest {
@@ -151,6 +150,6 @@ class OrderedPropertiesTest {
     void testEntrySetNotImplemented() throws IOException {
         final Properties props = new OrderedProperties();
 
-        assertThrows(NotImplementedException.class, () -> props.entrySet());
+        assertThrows(UnsupportedOperationException.class, () -> props.entrySet());
     }
 }
