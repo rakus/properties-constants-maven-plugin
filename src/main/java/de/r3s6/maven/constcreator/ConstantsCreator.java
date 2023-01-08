@@ -151,7 +151,7 @@ public class ConstantsCreator extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
             if (!isValidPackageName(basePackage)) {
-                throw new MojoExecutionException("Configures basePackage \"" + basePackage + "\" is invalid.");
+                throw new MojoExecutionException("Configured basePackage \"" + basePackage + "\" is invalid.");
             }
 
             cleanupDeletes();
