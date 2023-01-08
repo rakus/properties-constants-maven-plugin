@@ -14,9 +14,9 @@ class TestCaseTest {
         assertEquals("umlauts", TestCase.UMLAUTS);
         assertEquals("0key", TestCase._0KEY);
         assertEquals("key-1", TestCase.KEY_1);
-        assertEquals("key..2", TestCase.KEY__2);
+        assertEquals("key..2", TestCase.KEY_2);
         assertEquals("key$3", TestCase.KEY$3);
-        assertEquals(".key4", TestCase._KEY4);
+        assertEquals(".key4", TestCase.KEY4);
     }
 
     @Test
@@ -29,9 +29,9 @@ class TestCaseTest {
         final Properties props = TestCase.loadProperties();
         assertEquals("ÄÖÜäöüß", props.getProperty(TestCase.UMLAUTS));
         assertEquals("Key 1", props.getProperty(TestCase.KEY_1));
-        assertEquals("Key 2", props.getProperty(TestCase.KEY__2));
+        assertEquals("Key 2", props.getProperty(TestCase.KEY_2));
         assertEquals("Key 3", props.getProperty(TestCase.KEY$3));
-        assertEquals("Key 4", props.getProperty(TestCase._KEY4));
+        assertEquals("Key 4", props.getProperty(TestCase.KEY4));
     }
 
 }

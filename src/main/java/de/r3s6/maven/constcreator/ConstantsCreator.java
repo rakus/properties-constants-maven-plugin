@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -230,7 +229,7 @@ public class ConstantsCreator extends AbstractMojo {
 
         buildContext.removeMessages(propFile);
 
-        final Map<String, String> entries = new LinkedHashMap<>();
+        final List<PropEntry> entries = new ArrayList<>();
         try (InputStream is = new FileInputStream(propFile)) {
             final Properties props = new OrderedProperties();
             if (genReq.isXmlProperties()) {
@@ -238,17 +237,14 @@ public class ConstantsCreator extends AbstractMojo {
             } else {
                 props.load(is);
             }
-            props.keySet().stream().forEach(k -> entries.put((String) k, props.getProperty((String) k)));
+            props.keySet().stream().forEach(k -> entries.add(new PropEntry((String) k, props.getProperty((String) k))));
 
         } catch (final IOException e) {
 
             addError(propFile, 0, 0, "Error loading properties file: " + e.getMessage(), e);
             return;
-        }
-
-        if (entries.containsKey("")) {
-            addError(propFile, 0, 0, "File contains entry with empty key", null);
-            return;
+        } catch (final IllegalArgumentException e) {
+            addError(propFile, 0, 0, "Properties file " + propFile + " contains invalid key: " + e.getMessage(), e);
         }
 
         final File javaFile = genReq.getJavaFile();
@@ -262,7 +258,7 @@ public class ConstantsCreator extends AbstractMojo {
         }
     }
 
-    private void createStringConstants(final GeneratorRequest genRequest, final Map<String, String> entries,
+    private void createStringConstants(final GeneratorRequest genRequest, final List<PropEntry> entries,
             final File javaFile) throws IOException, FileNotFoundException {
 
         // CSOFF: MultipleString
@@ -288,14 +284,14 @@ public class ConstantsCreator extends AbstractMojo {
             pw.printf(" */%n");
             pw.printf("public final class %s {%n", genRequest.getSimpleClassName());
             pw.println();
-
-            for (final Entry<String, String> entry : entries.entrySet()) {
+            
+            for (PropEntry entry : entries) {
                 final String k = entry.getKey();
                 final String v = entry.getValue();
                 pw.printf("    /**%n");
                 pw.printf("     * %s=%s%n", k, v);
                 pw.printf("     */%n");
-                pw.printf("    public final static String %s = \"%s\";\n", keyToConstant(k), k);
+                pw.printf("    public final static String %s = \"%s\";\n", entry.getConstantName(), k);
                 pw.printf("\n");
             }
 
