@@ -19,7 +19,7 @@ class GeneratorRequestTest {
 
         GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test.properties", false);
         assertEquals("test.properties", gr.getPropertiesFileName());
-        assertEquals("test", gr.getPropertiesBasename());
+        assertEquals("test", gr.getBundleName());
         assertEquals("pkg.Test", gr.getFullClassName());
         assertEquals("pkg/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test.properties", gr.getPropertiesFile().getPath());
@@ -27,7 +27,7 @@ class GeneratorRequestTest {
 
         gr = new GeneratorRequest(IN, OUT, "pkg", "test-case.properties", false);
         assertEquals("test-case.properties", gr.getPropertiesFileName());
-        assertEquals("test-case", gr.getPropertiesBasename());
+        assertEquals("test-case", gr.getBundleName());
         assertEquals("pkg.TestCase", gr.getFullClassName());
         assertEquals("pkg/TestCase.java", gr.getJavaFileName());
         assertEquals("input-dir/test-case.properties", gr.getPropertiesFile().getPath());
@@ -40,7 +40,7 @@ class GeneratorRequestTest {
 
         final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", false);
         assertEquals("test/test.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getPropertiesBasename());
+        assertEquals("test/test", gr.getBundleName());
         assertEquals("pkg.test.Test", gr.getFullClassName());
         assertEquals("pkg/test/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test.properties", gr.getPropertiesFile().getPath());
@@ -52,7 +52,7 @@ class GeneratorRequestTest {
 
         final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", true);
         assertEquals("test/test.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getPropertiesBasename());
+        assertEquals("test/test", gr.getBundleName());
         assertEquals("pkg.Test", gr.getFullClassName());
         assertEquals("pkg/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test.properties", gr.getPropertiesFile().getPath());
@@ -85,7 +85,7 @@ class GeneratorRequestTest {
 
         GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test_en.properties", false);
         assertEquals("test/test_en.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getPropertiesBasename());
+        assertEquals("test/test", gr.getBundleName());
         assertEquals("pkg.test.Test", gr.getFullClassName());
         assertEquals("pkg/test/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test_en.properties", gr.getPropertiesFile().getPath());
@@ -93,7 +93,7 @@ class GeneratorRequestTest {
 
         gr = new GeneratorRequest(IN, OUT, "pkg", "test/test_en_US.properties", false);
         assertEquals("test/test_en_US.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getPropertiesBasename());
+        assertEquals("test/test", gr.getBundleName());
         assertEquals("pkg.test.Test", gr.getFullClassName());
         assertEquals("pkg/test/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test_en_US.properties", gr.getPropertiesFile().getPath());
@@ -105,7 +105,7 @@ class GeneratorRequestTest {
 
         final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.xml", false);
         assertEquals("test/test.xml", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getPropertiesBasename());
+        assertEquals("test/test", gr.getBundleName());
         assertEquals("pkg.test.Test", gr.getFullClassName());
         assertEquals("pkg/test/Test.java", gr.getJavaFileName());
         assertEquals("input-dir/test/test.xml", gr.getPropertiesFile().getPath());

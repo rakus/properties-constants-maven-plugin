@@ -15,13 +15,10 @@ import java.util.regex.Pattern;
  *
  */
 // CSOFF: MultipleString
-final class GeneratorRequest {
+public final class GeneratorRequest {
 
     /** Pattern to match invalid variable name chars. */
     private static final Pattern INVALID_NAME_CHARS = Pattern.compile("[^A-Za-z0-9_]");
-
-    /** Class name with package. */
-    private final String fullClassName;
 
     /** Package name. */
     private final String pkgName;
@@ -29,8 +26,11 @@ final class GeneratorRequest {
     /** Simple class name (without package). */
     private final String className;
 
+    /** Class name with package. */
+    private final String fullClassName;
+
     /** The java output file name, relative to the output directory. */
-    private final String javaFilename;
+    private final String javaFileName;
 
     /** the java output file. */
     private final File javaFile;
@@ -45,9 +45,9 @@ final class GeneratorRequest {
     private final boolean xmlProperties;
 
     /**
-     * Basename is file name with extension and language marker (e.g "_en") removed.
+     * Bundle name is file name with extension and language marker (e.g "_en") removed.
      */
-    private final String propertyBasename;
+    private final String bundleName;
 
     GeneratorRequest(final File resourceDir, final File outputDir, final String pkgName, final String propFileName,
             final boolean flatten) {
@@ -65,14 +65,14 @@ final class GeneratorRequest {
         this.xmlProperties = propFileName.toLowerCase().endsWith(".xml");
 
         // remove extension and locale stuff
-        this.propertyBasename = propFileName.replaceAll("\\.[^.]*$", "").replaceAll("_[a-z][a-z](_[A-Z][A-Z])?$", "");
+        this.bundleName = propFileName.replaceAll("\\.[^.]*$", "").replaceAll("_[a-z][a-z](_[A-Z][A-Z])?$", "");
 
         // concat and replace file separators
         final String fqName;
         if (flatten) {
-            fqName = (pkgName + "." + propertyBasename.replaceFirst("^.*[\\/]", "")).replaceAll("[\\/]", ".");
+            fqName = (pkgName + "." + bundleName.replaceFirst("^.*[\\/]", "")).replaceAll("[\\/]", ".");
         } else {
-            fqName = (pkgName + "." + propertyBasename).replaceAll("[\\/]", ".");
+            fqName = (pkgName + "." + bundleName).replaceAll("[\\/]", ".");
         }
 
         final int lastDotIdx = fqName.lastIndexOf('.');
@@ -97,7 +97,7 @@ final class GeneratorRequest {
         this.className = cName;
         this.fullClassName = pName + "." + cName;
 
-        this.javaFilename = this.fullClassName.replace('.', '/') + ".java";
+        this.javaFileName = this.fullClassName.replace('.', '/') + ".java";
 
         this.propertiesFile = new File(resourceDir, this.propertyFileName);
         this.javaFile = new File(outputDir, getJavaFileName());
@@ -121,50 +121,46 @@ final class GeneratorRequest {
         return 17 * fullClassName.hashCode();
     }
 
-    /** The package name. */
-    String getPkgName() {
+    public String getPkgName() {
         return pkgName;
     }
 
-    /** The simple class name. */
-    String getSimpleClassName() {
+    public String getSimpleClassName() {
         return className;
     }
 
-    /** Fully qualified class name with package. */
-    String getFullClassName() {
+    public String getFullClassName() {
         return fullClassName;
     }
 
-    /**
-     * File name of Java file relative to output folder.
-     */
-    String getJavaFileName() {
-        return javaFilename;
+    public String getJavaFileName() {
+        return javaFileName;
     }
 
-    /** The java output file. */
     public File getJavaFile() {
         return javaFile;
     }
 
-    /** Name of the properties file relative to search dir. */
     public String getPropertiesFileName() {
         return propertyFileName;
     }
 
-    /** The properties input file. */
     public File getPropertiesFile() {
         return propertiesFile;
     }
 
     /**
-     * Basename is file name with extension and locale marker (e.g "_en") removed.
+     * The resource bundle name.
+     * <p>
+     * This is the file name of the properties file with extension and locale marker
+     * (e.g "_en") removed.
      * <p>
      * E.g. {@code dir/messages_en_US.properties} becomes {@code dir/messages}.
+     *
+     * @return the bundle name
      */
-    public String getPropertiesBasename() {
-        return propertyBasename;
+    public String getBundleName() {
+        return bundleName;
     }
 
     public boolean isXmlProperties() {

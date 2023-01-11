@@ -11,7 +11,7 @@ The following diagram shows the default layout used by the properties-constants-
 
     Project Root
      |
-     +- src/main/resources             # directory to scan for properties files
+     +- src/main/resources             # directory scanned for properties files
      |
      +- target
           |
@@ -23,6 +23,8 @@ $H2 Simple properties
 Reads `*.properties` files from `src/main/resources` and generates Java classes
 in the package `de.r3s6.constants`. Support methods for Properties are generated.
 
+The default template "keys" is used.
+
 ```xml
 <build>
     <plugins>
@@ -30,17 +32,19 @@ in the package `de.r3s6.constants`. Support methods for Properties are generated
             <groupId>${project.groupId}</groupId>
             <artifactId>${project.artifactId}</artifactId>
             <version>${project.version}</version>
-            <configuration>
-                <basePackage>de.r3s6.constants</basePackage>
-                <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                <genPropertiesLoader>true</genPropertiesLoader>
-            </configuration>
             <executions>
                 <execution>
                     <phase>generate-sources</phase>
                     <goals>
                         <goal>generate</goal>
                     </goals>
+                    <configuration>
+                        <basePackage>de.r3s6.constants</basePackage>
+                        <templateOptions>
+                            <genGetPropertiesFilename>true</genGetPropertiesFilename>
+                            <genLoadProperties>true</genLoadProperties>
+                        </templateOptions>
+                    </configuration>
                 </execution>
             </executions>
         </plugin>
@@ -48,6 +52,31 @@ in the package `de.r3s6.constants`. Support methods for Properties are generated
 </build>
 ```
 
+To create constants that contains property values, use the template "values".
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>${project.artifactId}</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <basePackage>de.r3s6.constants</basePackage>
+                        <template>values</template>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
 
 $H2 I18N - ResourceBundle
 
@@ -70,8 +99,10 @@ ResourceBundles are generated.
                 <excludes>
                     <exclude>i18n/*_??.properties</exclude>
                 </excludes>
-                <genGetBundleName>true</genGetBundleName>
-                <genBundleLoader>true</genBundleLoader>
+                <templateOptions>
+                    <genGetBundleName>true</genGetBundleName>
+                    <genLoadBundle>true</genLoadBundle>
+                </templateOptions>
             </configuration>
             <executions>
                 <execution>

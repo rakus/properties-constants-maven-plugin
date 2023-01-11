@@ -57,8 +57,24 @@
                             <includes>
                                 <include>*.properties</include>
                             </includes>
-                            <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                            <genPropertiesLoader>true</genPropertiesLoader>
+                            <templateOptions>
+                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
+                                <genLoadProperties>true</genLoadProperties>
+                            </templateOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>value-constants</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <basePackage>de.tester.constants.values</basePackage>
+                            <includes>
+                                <include>*.properties</include>
+                            </includes>
+                            <template>values</template>
                         </configuration>
                     </execution>
                     <execution>
@@ -74,8 +90,10 @@
                             <excludes>
                                 <exclude>messages/*_??.properties</exclude>
                             </excludes>
-                            <genGetBundleName>true</genGetBundleName>
-                            <genBundleLoader>true</genBundleLoader>
+                            <templateOptions>
+                                <genGetBundleName>true</genGetBundleName>
+                                <genLoadBundle>true</genLoadBundle>
+                            </templateOptions>
                         </configuration>
                     </execution>
                     <execution>
@@ -88,8 +106,10 @@
                             <includes>
                                 <include>*.xml</include>
                             </includes>
-                            <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                            <genPropertiesLoader>true</genPropertiesLoader>
+                            <templateOptions>
+                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
+                                <genLoadProperties>true</genLoadProperties>
+                            </templateOptions>
                         </configuration>
                     </execution>
                     <execution>
@@ -103,8 +123,10 @@
                                 <include>subdir/*.properties</include>
                             </includes>
                             <flattenPackage>true</flattenPackage>
-                            <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                            <genPropertiesLoader>true</genPropertiesLoader>
+                            <templateOptions>
+                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
+                                <genLoadProperties>true</genLoadProperties>
+                            </templateOptions>
                         </configuration>
                     </execution>
                 </executions>

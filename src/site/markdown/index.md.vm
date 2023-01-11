@@ -7,9 +7,14 @@
 $H1 ${project.name}
 
 This plug-in reads properties files and generates Java classes holding
-constants for the property keys. It scans a given directory (default
+constants for the property keys or values. It scans a given directory (default
 `src/main/resources`) for properties files and creates constants classes for
 all of them.
+
+By default a generated class containing constants for the keys to access the
+properties. By configuration the class could be generated to contain constants
+holding the values from the properties file. In this case the properties file
+itself is not needed during runtime.
 
 If requested, the classes contain methods to load the properties file as
 `ResourceBundle` or `Properties`.
@@ -26,23 +31,25 @@ welcome=Welcome to Maven
 goodby=See you next time
 ```
 
-From this file, the following Java class will be generated.
+With the default template `keys` the following Java class will be generated.
 
 ```java
 /**
- * Constants for messages.properties.
+ * Constants for messages.properties
+ * <p>
+ * The constant values are the keys to access the properties.
  *
  * @author properties-constants-maven-plugin
  */
 public final class Messages {
 
     /**
-     * welcome=Welcome to Maven
+     * Key of welcome=Welcome to Maven
      */
     public final static String WELCOME = "welcome";
 
     /**
-     * goodby=See you next time
+     * Key of goodby=See you next time
      */
     public final static String GOODBY = "goodby";
 
@@ -53,9 +60,40 @@ public final class Messages {
 }
 ```
 
+With the template `values` the following Java class will be generated.
+```java
+/**
+ * Constants for messages.properties
+ * <p>
+ * The constant values are the values of the properties.
+ *
+ * @author properties-constants-maven-plugin
+ */
+public final class Messages {
+
+    /**
+     * Value of welcome=Welcome to Maven
+     */
+    public final static String WELCOME = "Welcome to Maven";
+
+    /**
+     * Value of goodby=See you next time
+     */
+    public final static String GOODBY = "See you next time";
+
+    /** Hidden constructor. */
+    private Messages() {
+        // nothing to instantiate
+    }
+}
+```
+
 $H3 Additional Methods
 
-Per configuration additional static methods are added to the generated class.
+The default template `keys` supports template options to generate additional
+static methods in the generated class.
+
+Note that the template `values` does not support any template options.
 
 Option `genGetPropertiesFilename` adds a method to get the properties file name
 relative to the configured base directory:
@@ -65,24 +103,27 @@ relative to the configured base directory:
  * Returns the filename of the properties file used to generate
  * this class.
  *
- * @returns always "messages.properties"
+ * @return always "messages.properties"
  */
 public static String getPropertiesFilename() {
     return "messages.properties";
 }
 ```
 
-Option `genPropertiesLoader` adds a method to load the `Properties`:
+Option `genLoadProperties` adds a method to load the `Properties`:
 
 ```java
 /**
- * Loads the properties file "/messages.properties" from the classpath.
- * @returns the loaded properties
- * @throws IOException on load problems
+ * Loads the properties file "messages.properties" from the classpath.
+ * @return the loaded properties
+ * @throws IOException if properties file not found or on load problems
  */
 public static Properties loadProperties() throws IOException {
     final Properties properties = new Properties();
     try (final InputStream stream = Messages.class.getResourceAsStream("/messages.properties")) {
+        if(stream == null) {
+            throw new IOException("Resource not found: messages.properties");
+        }
         properties.load(stream);
     }
     return properties;
@@ -95,22 +136,23 @@ the properties file name excluding extension and possible locale marker.
 ```java
 /**
  * Returns the bundle name - this is the properties file name
- * used to generate this class excluding extension and locale marker.
+ * used to generate this class excluding extension and locale part.
  *
- * @returns always "messages"
+ * @return always "messages"
  */
 public static String getBundleName() {
     return "messages";
 }
 ```
 
-Option `genBundleLoader` adds methods to load the properties file as
+Option `genLoadBundle` adds methods to load the properties file as
 `ResourceBundle`.
 
 ```java
 /**
  * Loads the resource bundle "messages" for the default locale.
- * @returns the loaded bundle
+ * @return the loaded bundle
+ * @throws MissingResourceException if bundle couldn't be found
  */
 public static ResourceBundle loadBundle() {
     return ResourceBundle.getBundle("messages");
@@ -119,7 +161,9 @@ public static ResourceBundle loadBundle() {
 /**
  * Loads the resource bundle "messages" for the given locale.
  * @param locale the locale to use
- * @returns the loaded bundle
+ * @return the loaded bundle
+ * @throws MissingResourceException if bundle couldn't be found
+ * @throws NullPointerException if locale is null
  */
 public static ResourceBundle loadBundle(final Locale locale) {
     return ResourceBundle.getBundle("messages", locale);
@@ -156,14 +200,25 @@ __Examples__
 
 | Property Key  | Java Constant |
 |---------------|---------------|
-| testCase      | TEST_CASE     |
-| test.case     | TEST_CASE     |
-| test..case    | TEST__CASE    |
-| test_case     | TEST_CASE     |
-| test$case     | TEST$CASE     |
-| 0test         | _0TEST        |
-| %test         | _TEST         |
+| `testCase`    | `TEST_CASE`   |
+| `test.case`   | `TEST_CASE`   |
+| `test..case`  | `TEST__CASE`  |
+| `test_case`   | `TEST_CASE`   |
+| `test$case`   | `TEST$CASE`   |
+| `0test`       | `_0TEST`      |
+| `%test`       | `_TEST`       |
 
+__Recommendations__
+
+Also this plugin should be able to handle any properties keys,
+it works best if the keys ...
+
+* only contain ASCII characters, digits and the separators dot, underscore and dash (aka minus-sign).
+* start with a ASCII character.
+* end with a ASCII character or a digit.
+* never contain two or more consecutive separators.
+
+It is also recommended to only use lower case ASCII characters.
 
 ---
 The plugin requires **Maven ${project.prerequisites.maven}** or later and

@@ -2,13 +2,13 @@ package de.r3s6.maven.constcreator;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import freemarker.template.TemplateException;
+
 /**
  * Goal to create Java constant classes from properties files.
  *
@@ -42,6 +44,10 @@ public class ConstantsCreator extends AbstractMojo {
      * Pattern to match the transition from lowercase to uppercase characters.
      */
     private static final Pattern SMALL_BIG = Pattern.compile("([a-z])([A-Z])");
+
+    private static final String KEYS_TEMPLATE_ID = "keys";
+    private static final String VALUES_TEMPLATE_ID = "values";
+    private static final String DEFAULT_TEMPLATE_ID = KEYS_TEMPLATE_ID;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -106,34 +112,32 @@ public class ConstantsCreator extends AbstractMojo {
     private boolean flattenPackage;
 
     /**
-     * Generate methods to return the properties file name.
+     * Template id or file name.
      * <p>
-     * The name is relative to {@code resourceDir} parameter.
+     * The plugin provides the templates "keys" and "values".
      * <p>
-     * <code>public static String getPropertiesFilename()</code><br>
+     * A file name can be given for a custom Freemarker template.
      */
-    @Parameter(defaultValue = "false")
-    private boolean genGetPropertiesFilename;
+    @Parameter(defaultValue = DEFAULT_TEMPLATE_ID)
+    private String template = DEFAULT_TEMPLATE_ID;
 
     /**
-     * Generate a method to load the properties file via class path.
+     * Additional options for the selected template.
      * <p>
-     * <code>public static Properties loadProperties() throws IOException</code>
+     * The template "keys" supports the following options:
+     * <dl>
+     * <dt>genGetPropertiesFilename</dt>
+     * <dd>generate the method <tt>getPropertiesFilename()</tt></dd>
+     * <dt>genLoadProperties</dt>
+     * <dd>generate the method <tt>loadProperties()</tt></dd>
+     * <dt>genGetBundleName</dt>
+     * <dd>generate the method <tt>getBundleName()</tt></dd>
+     * <dt>genLoadBundle</dt>
+     * <dd>generate the method <tt>loadBundle()</tt> and <tt>loadBundle(Locale)</tt></dd>
+     * </dl>
      */
-    @Parameter(defaultValue = "false")
-    private boolean genPropertiesLoader;
-
-    /**
-     * Generate methods to return the bundle name.
-     * <p>
-     * This is the properties file name without extension and locale part.
-     * <p>
-     * The name is relative to {@code resourceDir} parameter.
-     * <p>
-     * <code>public static String getBundleName()</code><br>
-     */
-    @Parameter(defaultValue = "false")
-    private boolean genGetBundleName;
+    @Parameter
+    private Map<String, String> templateOptions = new HashMap<>();
 
     /**
      * Generate methods to load the properties file as ResourceBundle.
@@ -144,10 +148,15 @@ public class ConstantsCreator extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean genBundleLoader;
 
+    private TemplateHandler tmplHandler;
+
     private List<String> errorMessages = new ArrayList<>();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        tmplHandler = new TemplateHandler(project);
+
         if (!skip) {
             if (!isValidPackageName(basePackage)) {
                 throw new MojoExecutionException("Configured basePackage \"" + basePackage + "\" is invalid.");
@@ -240,7 +249,6 @@ public class ConstantsCreator extends AbstractMojo {
             props.keySet().stream().forEach(k -> entries.add(new PropEntry((String) k, props.getProperty((String) k))));
 
         } catch (final IOException e) {
-
             addError(propFile, 0, 0, "Error loading properties file: " + e.getMessage(), e);
             return;
         } catch (final IllegalArgumentException e) {
@@ -254,135 +262,59 @@ public class ConstantsCreator extends AbstractMojo {
         try {
             createStringConstants(genReq, entries, javaFile);
         } catch (final IOException e) {
-            addError(genReq.getPropertiesFile(), 0, 0, "Error generating Java file " + genReq.getJavaFileName(), e);
+            addError(genReq.getPropertiesFile(), 0, 0,
+                    "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
+        } catch (TemplateException e) {
+            final String tmplName = e.getEnvironment().getTemplate().getName();
+            addError(genReq.getPropertiesFile(), 0, 0,
+                    "Error processing template" + tmplName + " (" + e.getMessage() + ")", e);
         }
     }
 
     private void createStringConstants(final GeneratorRequest genRequest, final List<PropEntry> entries,
-            final File javaFile) throws IOException, FileNotFoundException {
+            final File javaFile) throws IOException, TemplateException {
+
+        final Map<String, Object> model = buildModel(genRequest, entries);
+
+        final String templateFile;
+
+        switch (this.template) {
+        case KEYS_TEMPLATE_ID:
+        case VALUES_TEMPLATE_ID:
+            templateFile = this.template + ".ftl";
+            break;
+
+        default:
+            templateFile = this.template;
+            break;
+        }
 
         // CSOFF: MultipleString
         try (PrintWriter pw = new PrintWriter(
                 new OutputStreamWriter(buildContext.newFileOutputStream(javaFile), sourceEncoding))) {
-            pw.printf("package %s;%n", genRequest.getPkgName());
-            pw.println();
-            if (genBundleLoader) {
-                pw.println("import java.util.Locale;");
-                pw.println("import java.util.ResourceBundle;");
-            }
-            if (genPropertiesLoader) {
-                pw.println("import java.util.Properties;");
-                pw.println("import java.io.IOException;");
-                pw.println("import java.io.InputStream;");
-            }
-            pw.println();
 
-            pw.printf("/**%n");
-            pw.printf(" * Constants for %s.%n", genRequest.getPropertiesFileName());
-            pw.printf(" * %n");
-            pw.printf(" * @author properties-constants-maven-plugin%n");
-            pw.printf(" */%n");
-            pw.printf("public final class %s {%n", genRequest.getSimpleClassName());
-            pw.println();
-            
-            for (PropEntry entry : entries) {
-                final String k = entry.getKey();
-                final String v = entry.getValue();
-                pw.printf("    /**%n");
-                pw.printf("     * %s=%s%n", k, v);
-                pw.printf("     */%n");
-                pw.printf("    public final static String %s = \"%s\";\n", entry.getConstantName(), k);
-                pw.printf("\n");
-            }
+            tmplHandler.process(templateFile, model, pw);
 
-            pw.printf("    /** Hidden constructor. */%n");
-            pw.printf("    private %s() {%n", genRequest.getSimpleClassName());
-            pw.printf("        // nothing to instantiate%n");
-            pw.printf("    }%n");
-            pw.println();
-
-            if (genGetBundleName) {
-                pw.printf("    /**%n");
-                pw.printf("     * Returns the bundle name - this is the properties file name%n");
-                pw.printf("     * used to generate this class excluding extension and locale part.%n");
-                pw.printf("     * %n");
-                pw.printf("     * @return always \"%s\"%n", genRequest.getPropertiesBasename());
-                pw.printf("     */%n");
-                pw.printf("    public static String getBundleName() {%n");
-                pw.printf("        return \"%s\";%n", genRequest.getPropertiesBasename());
-                pw.printf("    }%n");
-                pw.println();
-            }
-
-            if (genBundleLoader) {
-                pw.printf("    /**%n");
-                pw.printf("     * Loads the resource bundle \"%s\" for the default locale.%n",
-                        genRequest.getPropertiesBasename());
-                pw.printf("     * @return the loaded bundle%n");
-                pw.printf("     * @throws MissingResourceException if bundle couldn't be found%n");
-                pw.printf("     */%n");
-                pw.printf("    public static ResourceBundle loadBundle() {%n");
-                pw.printf("        return ResourceBundle.getBundle(\"%s\");%n", genRequest.getPropertiesBasename());
-                pw.printf("    }%n");
-                pw.println();
-
-                pw.printf("    /**%n");
-                pw.printf("     * Loads the resource bundle \"%s\" for the given locale.%n",
-                        genRequest.getPropertiesBasename());
-                pw.printf("     * @param locale the locale to use%n");
-                pw.printf("     * @return the loaded bundle%n");
-                pw.printf("     * @throws MissingResourceException if bundle couldn't be found%n");
-                pw.printf("     * @throws NullPointerException if locale is null%n");
-                pw.printf("     */%n");
-                pw.printf("    public static ResourceBundle loadBundle(final Locale locale) {%n");
-                pw.printf("        return ResourceBundle.getBundle(\"%s\", locale);%n",
-                        genRequest.getPropertiesBasename());
-                pw.printf("    }%n");
-                pw.println();
-            }
-
-            if (genGetPropertiesFilename) {
-                pw.printf("    /**%n");
-                pw.printf("     * Returns the filename of the properties file used to generate%n");
-                pw.printf("     * this class.%n");
-                pw.printf("     * %n");
-                pw.printf("     * @return always \"%s\"%n", genRequest.getPropertiesFileName());
-                pw.printf("     */%n");
-                pw.printf("    public static String getPropertiesFilename() {%n");
-                pw.printf("        return \"%s\";%n", genRequest.getPropertiesFileName());
-                pw.printf("    }%n");
-                pw.println();
-            }
-
-            if (genPropertiesLoader) {
-                pw.printf("    /**%n");
-                pw.printf("     * Loads the properties file \"/%s\" from the classpath.%n",
-                        genRequest.getPropertiesFileName());
-                pw.printf("     * @return the loaded properties%n");
-                pw.printf("     * @throws IOException if properties file not found or on load problems%n");
-                pw.printf("     */%n");
-                pw.printf("    public static Properties loadProperties() throws IOException {%n");
-                pw.printf("        final Properties properties = new Properties();%n");
-                pw.printf("        try (final InputStream stream = %s.class.getResourceAsStream(\"/%s\")) {%n",
-                        genRequest.getSimpleClassName(), genRequest.getPropertiesFileName());
-                pw.printf("            if(stream == null) {%n");
-                pw.printf("                throw new IOException(\"Resource not found: %s\");%n",
-                        genRequest.getPropertiesFileName());
-                pw.printf("            }%n");
-                if (genRequest.isXmlProperties()) {
-                    pw.printf("            properties.loadFromXML(stream);%n");
-                } else {
-                    pw.printf("            properties.load(stream);%n");
-                }
-                pw.printf("        }%n");
-                pw.printf("        return properties;%n");
-                pw.printf("    }%n");
-                pw.println();
-            }
-
-            pw.printf("}%n");
         }
         // CSON: MultipleString
+    }
+
+    private Map<String, Object> buildModel(final GeneratorRequest genReq, final List<PropEntry> entries) {
+        final Map<String, Object> model = new HashMap<>();
+
+        model.put("pkgName", genReq.getPkgName());
+        model.put("simpleClassName", genReq.getSimpleClassName());
+        model.put("fullClassName", genReq.getFullClassName());
+        model.put("propertiesFileName", genReq.getPropertiesFileName());
+        model.put("javaFileName", genReq.getJavaFileName());
+        model.put("bundleName", genReq.getBundleName());
+        model.put("isXmlProperties", genReq.isXmlProperties());
+
+        model.put("entries", entries);
+
+        model.put("options", templateOptions);
+
+        return model;
     }
 
     private void addError(final File file, final int line, final int column, final String message) {
