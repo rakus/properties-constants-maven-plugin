@@ -6,7 +6,7 @@
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.7</version>
+        <version>1.11.1</version>
     </skin>
     <custom>
         <fluidoSkin>
@@ -31,6 +31,7 @@
             <item name="Introduction" href="index.html"/>
             <item name="Goals" href="plugin-info.html"/>
             <item name="Usage" href="usage.html"/>
+            <item name="Code Templates" href="code-templates.html"/>
             <item name="FAQ" href="faq.html"/>
             <item name="Changelog" href="CHANGELOG.html"/>
         </menu>

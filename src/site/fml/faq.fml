@@ -10,14 +10,14 @@
 
         <faq id="xml.properties">
             <question>
-                Does the <tt>properties-constants-maven-plugin</tt> support XML properties?
+                Does the <code>properties-constants-maven-plugin</code> support XML properties?
             </question>
             <answer>
-                <p>Yes, if the configuration also includes <tt>*.xml</tt> files, those files
-                are read using <tt>Properties.loadFromXml()</tt>.</p>
+                <p>Yes, if the configuration also includes <code>*.xml</code> files, those files
+                are read using <code>Properties.loadFromXml()</code>.</p>
                 <p>If a constant class is created from an XML file, the loader method
-                <tt>loadProperties()</tt> also uses <tt>loadFromXml()</tt>.</p>
-                <p>To include XML files use the configuration option <tt>&lt;includes&gt;</tt>
+                <code>loadProperties()</code> also uses <code>loadFromXml()</code>.</p>
+                <p>To include XML files use the configuration option <code>&lt;includes&gt;</code>
                 like:
                 </p>
                 <source>
@@ -28,7 +28,7 @@
                 <p> Note that the content must comply to the simple
                 <a href="http://java.sun.com/dtd/properties.dtd">Properties DTD</a>.
                 </p>
-                <p>Loading XML-Files as <tt>ResourceBundle</tt> is not supported out of the box.
+                <p>Loading XML-Files as <code>ResourceBundle</code> is not supported out of the box.
                 See <a href="#xml.resourcebundle">this question</a></p>
             </answer>
         </faq>
@@ -36,30 +36,30 @@
             <question>Which file extensions are required?</question>
             <answer>
             <p>The file extension is not relevant for the plugin. Files with the extension
-            <tt>xml</tt> (case insensitive) are read as XML. All other extensions are handled
-            like <tt>*.properties</tt>.</p>
+            <code>xml</code> (case insensitive) are read as XML. All other extensions are handled
+            like <code>*.properties</code>.</p>
             </answer>
         </faq>
         <faq id="load.failed">
             <question>Load of Properties or ResourceBundle failed at runtime. Why?</question>
             <answer>
-            <p>The generated static methods <tt>loadProperties()</tt> and <tt>loadBundle(...)</tt> use the
+            <p>The generated static methods <code>loadProperties()</code> and <code>loadBundle(...)</code> use the
             class loader to load the properties file. Prerequisites are:</p>
             <ol>
             <li>the properties file are added to the created jar and are available on the classpath</li>
-            <li>the configuration options <tt>&lt;resourceDir&gt;</tt> and <tt>&lt;includes&gt;</tt> are
+            <li>the configuration options <code>&lt;resourceDir&gt;</code> and <code>&lt;includes&gt;</code> are
                 used correctly</li>
             </ol>
             <p>The second point needs some explanation. The path to the properties file in the
-            generated Java code is relative to the configuration option <tt>&lt;resourceDir&gt;</tt>.
-            If the properties files to translate are located in <tt>src/main/resources/messages</tt>,
+            generated Java code is relative to the configuration option <code>&lt;resourceDir&gt;</code>.
+            If the properties files to translate are located in <code>src/main/resources/messages</code>,
             the plugin needs following configuration:</p>
                 <source>
 &lt;resourceDir&gt;src/main/resources&gt;   &lt;!-- the default --&gt;
 &lt;includes&gt;
     &lt;include&gt;messages/*.properties&lt;include&gt;
 &lt;/includes&gt;</source>
-            <p>Then the path to the properties in the generated Java file is <tt>messages/xyz.properties</tt>
+            <p>Then the path to the properties in the generated Java file is <code>messages/xyz.properties</code>
             and loading works.</p>
             </answer>
         </faq>
@@ -73,20 +73,20 @@
             <answer>
                 <p>The defined character encoding for properties files is ISO-8859-1 (sometime
                 called "latin1"). Every character outside of this character set has to be encode
-                using the <tt>\uXXXX</tt> representation.
+                using the <code>\uXXXX</code> representation.
                 </p>
-                <p>E.g.the simple smiley &#x263A; can be added with <tt>\u263A</tt>.</p>
+                <p>E.g.the simple smiley &#x263A; can be added with <code>\u263A</code>.</p>
                 <p>Depending on your use case, a XML properties file might be better. See above.</p>
-                <p>Beginning with Java9 the character set for <tt>ResourceBundle</tt>s can be
-                UTF-8. See the javadoc of <tt>java.util.PropertyResourceBundle</tt>.</p>
+                <p>Beginning with Java9 the character set for <code>ResourceBundle</code>s can be
+                UTF-8. See the javadoc of <code>java.util.PropertyResourceBundle</code>.</p>
             </answer>
         </faq>
         <faq id="xml.resourcebundle">
             <question>How can I load a ResourceBundle from a XML file?</question>
             <answer>
                 <p>This is not supported by default but can be implemented by extending
-                <tt>ResourceBundle.Control</tt> and implementing <tt>ResourceBundleControlProvider</tt>
-                and a <tt>ServiceLoader</tt> config.</p>
+                <code>ResourceBundle.Control</code> and implementing <code>ResourceBundleControlProvider</code>
+                and a <code>ServiceLoader</code> config.</p>
                 <p>For Java8 this is explained in this
                 <a href="https://docs.oracle.com/javase/tutorial/i18n/serviceproviders/resourcebundlecontrolprovider.html">Java Tutorial</a>.</p>
             </answer>

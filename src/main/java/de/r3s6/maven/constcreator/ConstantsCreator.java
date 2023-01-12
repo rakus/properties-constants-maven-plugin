@@ -114,7 +114,7 @@ public class ConstantsCreator extends AbstractMojo {
     /**
      * Template id or file name.
      * <p>
-     * The plugin provides the templates "keys" and "values".
+     * The plugin provides the templates <code>keys</code> and <code>values</code>.
      * <p>
      * A file name can be given for a custom Freemarker template.
      */
@@ -124,29 +124,21 @@ public class ConstantsCreator extends AbstractMojo {
     /**
      * Additional options for the selected template.
      * <p>
-     * The template "keys" supports the following options:
+     * The template <code>keys</code> supports the following options:
      * <dl>
      * <dt>genGetPropertiesFilename</dt>
-     * <dd>generate the method <tt>getPropertiesFilename()</tt></dd>
+     * <dd>generate the method <code>getPropertiesFilename()</code></dd>
      * <dt>genLoadProperties</dt>
-     * <dd>generate the method <tt>loadProperties()</tt></dd>
+     * <dd>generate the method <code>loadProperties()</code></dd>
      * <dt>genGetBundleName</dt>
-     * <dd>generate the method <tt>getBundleName()</tt></dd>
+     * <dd>generate the method <code>getBundleName()</code></dd>
      * <dt>genLoadBundle</dt>
-     * <dd>generate the method <tt>loadBundle()</tt> and <tt>loadBundle(Locale)</tt></dd>
+     * <dd>generate the method <code>loadBundle()</code> and
+     * <code>loadBundle(Locale)</code></dd>
      * </dl>
      */
     @Parameter
     private Map<String, String> templateOptions = new HashMap<>();
-
-    /**
-     * Generate methods to load the properties file as ResourceBundle.
-     * <p>
-     * <code>public static ResourceBundle loadBundle()</code><br>
-     * <code>public static ResourceBundle loadBundle(Locale locale)</code>
-     */
-    @Parameter(defaultValue = "false")
-    private boolean genBundleLoader;
 
     private TemplateHandler tmplHandler;
 
