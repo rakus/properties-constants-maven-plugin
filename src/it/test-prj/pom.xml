@@ -129,6 +129,20 @@
                             </templateOptions>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>custom-template</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>*.properties</include>
+                            </includes>
+                            <classNameSuffix>Custom</classNameSuffix>
+                            <template>src/build/custom-template.ftl</template>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
