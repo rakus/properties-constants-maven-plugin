@@ -112,6 +112,15 @@ public class ConstantsCreator extends AbstractMojo {
     private boolean flattenPackage;
 
     /**
+     * Suffix to append to generated class names.
+     * <p>
+     * Must be a valid java name by itself,
+     * {@code SourceVersion.isIdentifier(classNameSuffix))} must return true.
+     */
+    @Parameter(defaultValue = "")
+    private String classNameSuffix = "";
+
+    /**
      * Template id or file name.
      * <p>
      * The plugin provides the templates <code>keys</code> and <code>values</code>.
@@ -150,8 +159,12 @@ public class ConstantsCreator extends AbstractMojo {
         tmplHandler = new TemplateHandler(project);
 
         if (!skip) {
-            if (!isValidPackageName(basePackage)) {
+            if (!SourceVersion.isName(basePackage)) {
                 throw new MojoExecutionException("Configured basePackage \"" + basePackage + "\" is invalid.");
+            }
+
+            if (classNameSuffix.length() != 0 && !SourceVersion.isIdentifier(classNameSuffix)) {
+                throw new MojoExecutionException("Configured classNameSuffix \"" + classNameSuffix + "\" is invalid.");
             }
 
             cleanupDeletes();
@@ -197,7 +210,7 @@ public class ConstantsCreator extends AbstractMojo {
         final Map<String, GeneratorRequest> genRequests = new LinkedHashMap<>();
         for (final String propFile : scanner.getIncludedFiles()) {
             final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
-                    flattenPackage);
+                    flattenPackage, classNameSuffix);
             if (!genRequests.containsKey(gr.getFullClassName())) {
                 genRequests.put(gr.getFullClassName(), gr);
             } else {
@@ -216,7 +229,7 @@ public class ConstantsCreator extends AbstractMojo {
 
         for (final String propFile : scanner.getIncludedFiles()) {
             final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
-                    flattenPackage);
+                    flattenPackage, classNameSuffix);
             if (gr.getJavaFile().exists()) {
                 gr.getJavaFile().delete();
                 buildContext.refresh(gr.getJavaFile());
@@ -352,27 +365,4 @@ public class ConstantsCreator extends AbstractMojo {
 
         return sb.toString();
     }
-
-    /**
-     * Checks whether the given name is a valid package name.
-     *
-     * @param pkgName the name to check
-     * @return whether the given name is a valid package name
-     */
-    static boolean isValidPackageName(final String pkgName) {
-        if (pkgName == null || pkgName.trim().isEmpty()) {
-            return false;
-        }
-
-        final String[] parts = pkgName.split("\\.");
-
-        for (final String p : parts) {
-            if (!SourceVersion.isName(p)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 }

@@ -45,16 +45,19 @@ public final class GeneratorRequest {
     private final boolean xmlProperties;
 
     /**
-     * Bundle name is file name with extension and language marker (e.g "_en") removed.
+     * Bundle name is file name with extension and language marker (e.g "_en")
+     * removed.
      */
     private final String bundleName;
 
+    // CSOFF: ParameterNumberCheck
     GeneratorRequest(final File resourceDir, final File outputDir, final String pkgName, final String propFileName,
-            final boolean flatten) {
+            final boolean flatten, final String classNameAppendix) {
         Objects.requireNonNull(resourceDir);
         Objects.requireNonNull(outputDir);
         Objects.requireNonNull(pkgName);
         Objects.requireNonNull(propFileName);
+        Objects.requireNonNull(classNameAppendix);
 
         if (pkgName.trim().length() == 0) {
             throw new IllegalArgumentException("Empty package name not supported");
@@ -92,6 +95,7 @@ public final class GeneratorRequest {
 
         cName = INVALID_NAME_CHARS.matcher(sb.toString()).replaceAll("");
         cName = cName.substring(0, 1).toUpperCase() + cName.substring(1);
+        cName = cName + classNameAppendix;
 
         this.pkgName = pName;
         this.className = cName;
@@ -103,6 +107,7 @@ public final class GeneratorRequest {
         this.javaFile = new File(outputDir, getJavaFileName());
 
     }
+    // CSON: ParameterNumberCheck
 
     @Override
     public boolean equals(final Object obj) {

@@ -1,8 +1,6 @@
 package de.r3s6.maven.constcreator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,26 +38,4 @@ class ConstantsCreatorTest {
         assertEquals("_PERCENT", ConstantsCreator.keyToConstant("%percent"));
 
     }
-
-    @Test
-    void testIsValidPackageName() {
-        assertTrue(ConstantsCreator.isValidPackageName("de"));
-        assertTrue(ConstantsCreator.isValidPackageName("de.r3s6"));
-        assertTrue(ConstantsCreator.isValidPackageName("de.r3s6.maven"));
-        assertTrue(ConstantsCreator.isValidPackageName("de.r3s6.maven.constcreator"));
-        assertTrue(ConstantsCreator.isValidPackageName("test.test_case.hello"));
-
-        assertFalse(ConstantsCreator.isValidPackageName(null));
-        assertFalse(ConstantsCreator.isValidPackageName(""));
-        assertFalse(ConstantsCreator.isValidPackageName("  "));
-        assertFalse(ConstantsCreator.isValidPackageName(" de "));
-        assertFalse(ConstantsCreator.isValidPackageName("de,r3s6"));
-        assertFalse(ConstantsCreator.isValidPackageName("de.r3s6.false"));
-        assertFalse(ConstantsCreator.isValidPackageName("de.r3s6.assert"));
-        assertFalse(ConstantsCreator.isValidPackageName("de.r3-s6"));
-        assertFalse(ConstantsCreator.isValidPackageName("de..r3s6"));
-        assertFalse(ConstantsCreator.isValidPackageName("de. .r3s6"));
-        assertFalse(ConstantsCreator.isValidPackageName("de .r3s6"));
-    }
-
 }
