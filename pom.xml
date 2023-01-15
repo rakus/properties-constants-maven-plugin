@@ -32,7 +32,7 @@
 
         <maven.version>3.8.2</maven.version>
         <junit.version>5.9.1</junit.version>
-        <freemarker.version>2.3.20</freemarker.version>
+        <freemarker.version>2.3.32</freemarker.version>
 
         <!-- don't lookup dependencies for project-info-report. Speeds up build. -->
         <dependency.locations.enabled>false</dependency.locations.enabled>

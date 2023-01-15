@@ -270,7 +270,7 @@ public class ConstantsCreator extends AbstractMojo {
             addError(genReq.getPropertiesFile(), 0, 0,
                     "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
         } catch (TemplateException e) {
-            final String tmplName = e.getEnvironment().getTemplate().getName();
+            final String tmplName = e.getEnvironment().getMainTemplate().getName();
             addError(genReq.getPropertiesFile(), 0, 0,
                     "Error processing template" + tmplName + " (" + e.getMessage() + ")", e);
         }

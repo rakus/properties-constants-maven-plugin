@@ -24,14 +24,16 @@ import freemarker.template.Version;
  */
 public class TemplateHandler {
 
-    private Configuration configuration = new Configuration();
+    private static final Version FREEMARKER_VERSION = new Version("2.3.32");
+
+    private Configuration configuration = new Configuration(FREEMARKER_VERSION);
 
     TemplateHandler(final MavenProject project) {
 
-        configuration.setObjectWrapper(new DefaultObjectWrapper());
+        configuration.setObjectWrapper(new DefaultObjectWrapper(FREEMARKER_VERSION));
         configuration.setDefaultEncoding("UTF-8");
         configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        configuration.setIncompatibleImprovements(new Version("2.3.20"));
+        configuration.setIncompatibleImprovements(FREEMARKER_VERSION);
 
         final ClassTemplateLoader classTl = new ClassTemplateLoader(getClass(), "/");
         final FileTemplateLoader projectTl;
@@ -40,7 +42,8 @@ public class TemplateHandler {
             projectTl = new FileTemplateLoader(project.getBasedir());
             absolutTl = new FileTemplateLoader(new File("/"));
         } catch (IOException e) {
-            // should not be reached. The project basedir and the root dir should always exist.
+            // should not be reached. The project basedir and the root dir should always
+            // exist.
             throw new IllegalStateException(e.getMessage(), e);
         }
 
