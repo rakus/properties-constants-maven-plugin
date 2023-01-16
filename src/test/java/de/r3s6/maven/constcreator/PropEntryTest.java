@@ -7,6 +7,18 @@ import org.junit.jupiter.api.Test;
 class PropEntryTest {
 
     @Test
+    void testIntroExamples() {
+        assertEquals("TEST_CASE", new PropEntry("testCase", "value").getConstantName());
+        assertEquals("TEST_CASE", new PropEntry("test.case", "value").getConstantName());
+        assertEquals("TEST_CASE", new PropEntry("test..case", "value").getConstantName());
+        assertEquals("TEST_CASE", new PropEntry("test_case", "value").getConstantName());
+        assertEquals("TEST_CASE", new PropEntry("test%case", "value").getConstantName());
+        assertEquals("TEST$CASE", new PropEntry("test$case", "value").getConstantName());
+        assertEquals("_0TEST", new PropEntry("0test", "value").getConstantName());
+        assertEquals("TEST", new PropEntry("%test", "value").getConstantName());
+    }
+
+    @Test
     void testSimple() {
         PropEntry entry = new PropEntry("first.name", "Joe");
         assertEquals("first.name", entry.getKey());

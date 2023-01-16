@@ -183,18 +183,10 @@ The plugin creates names for the Java constants from the names of
 the keys in the properties file.
 
 1. Trim leading and trailing whitespaces.
-2. Insert an underscore when a lower case character is followed by
-   an upper case character. E.g. `testCase` -> `test_Case`.
-3. Make the entire string upper case
-4. Check that the first character is valid as the leading character
-   of a Java name. If not, insert a leading underscore.
-   E.g. `0TEST` -> `_0TEST`.
-   If the now second character is not a valid Java identifier character
-   drop it.
-   E.g. `%TEST` -> `_TEST`.
-5. Replace all characters that are not valid Java identifier characters
-   with an underscore.
-   E.g. `TEST.CASE` -> `TEST_CASE`.
+2. Trim leading and trailing non Java indentifier char
+3. Split into parts on non Java indentifier chars and underscores
+4. Concatenate all parts with '_'
+5. Make entire String upper case.
 
 __Examples__
 
@@ -202,11 +194,12 @@ __Examples__
 |---------------|---------------|
 | `testCase`    | `TEST_CASE`   |
 | `test.case`   | `TEST_CASE`   |
-| `test..case`  | `TEST__CASE`  |
+| `test..case`  | `TEST_CASE`   |
 | `test_case`   | `TEST_CASE`   |
+| `test%case`   | `TEST_CASE`   |
 | `test$case`   | `TEST$CASE`   |
 | `0test`       | `_0TEST`      |
-| `%test`       | `_TEST`       |
+| `%test`       | `TEST`        |
 
 __Recommendations__
 

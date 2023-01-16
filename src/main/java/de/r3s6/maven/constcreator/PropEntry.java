@@ -72,13 +72,23 @@ public class PropEntry {
 
         final StringBuilder sb = new StringBuilder();
 
+        boolean lastIsLower = false;
+
         for (char chr : propKey.toCharArray()) {
 
+            final boolean isUpper = Character.isUpperCase(chr);
+
             if (chr != DIV_CHR && Character.isJavaIdentifierPart(chr)) {
+                if (lastIsLower && isUpper) {
+                    parts.add(sb.toString());
+                    sb.setLength(0);
+                }
                 sb.append(chr);
+                lastIsLower = !isUpper;
             } else if (sb.length() > 0) {
                 parts.add(sb.toString());
                 sb.setLength(0);
+                lastIsLower = false;
             }
         }
 
