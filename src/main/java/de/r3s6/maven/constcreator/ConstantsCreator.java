@@ -31,6 +31,7 @@ import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 
 /**
  * Goal to create Java constant classes from properties files.
@@ -237,7 +238,7 @@ public class ConstantsCreator extends AbstractMojo {
         }
     }
 
-    private void createConstants(final GeneratorRequest genReq) {
+    private void createConstants(final GeneratorRequest genReq) throws MojoExecutionException {
 
         final File propFile = genReq.getPropertiesFile();
 
@@ -266,13 +267,14 @@ public class ConstantsCreator extends AbstractMojo {
 
         try {
             createStringConstants(genReq, entries, javaFile);
+        } catch (TemplateNotFoundException e) {
+            throw new MojoExecutionException("Code template not found: " + e.getTemplateName(), e);
         } catch (final IOException e) {
             addError(genReq.getPropertiesFile(), 0, 0,
                     "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
         } catch (TemplateException e) {
             final String tmplName = e.getEnvironment().getMainTemplate().getName();
-            addError(genReq.getPropertiesFile(), 0, 0,
-                    "Error processing template" + tmplName + " (" + e.getMessage() + ")", e);
+            throw new MojoExecutionException("Code template not found: " + tmplName + " (" + e.getMessage() + ")", e);
         }
     }
 
