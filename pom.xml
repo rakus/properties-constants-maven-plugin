@@ -61,6 +61,13 @@
         </license>
     </licenses>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/rakus/properties-constants-maven-plugin</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
