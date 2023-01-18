@@ -73,9 +73,9 @@ public final class GeneratorRequest {
         // concat and replace file separators
         final String fqName;
         if (flatten) {
-            fqName = (pkgName + "." + bundleName.replaceFirst("^.*[\\/]", "")).replaceAll("[\\/]", ".");
+            fqName = (pkgName + "." + bundleName.replaceFirst("^.*[\\\\/]", "")).replaceAll("[\\\\/]", ".");
         } else {
-            fqName = (pkgName + "." + bundleName).replaceAll("[\\/]", ".");
+            fqName = (pkgName + "." + bundleName).replaceAll("[\\\\/]", ".");
         }
 
         final int lastDotIdx = fqName.lastIndexOf('.');
@@ -83,7 +83,7 @@ public final class GeneratorRequest {
         String cName = fqName.substring(lastDotIdx + 1);
 
         // clean package name
-        pName = pName.replaceAll("-", "");
+        pName = pName.replace("-", "");
 
         // clean class name
         final StringBuffer sb = new StringBuffer();

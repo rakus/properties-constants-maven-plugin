@@ -60,7 +60,7 @@ class GeneratorRequestTest {
     }
 
     @Test
-    @SuppressWarnings("unlikely-arg-type")
+    @SuppressWarnings({ "unlikely-arg-type", "java:S5785" })
     void testEquals() {
 
         final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", true, "");
@@ -68,6 +68,8 @@ class GeneratorRequestTest {
 
         final GeneratorRequest gr2 = new GeneratorRequest(IN, OUT, "pkg", "test/sub/test.properties", true, "");
         assertEquals("pkg.Test", gr2.getFullClassName());
+
+        // testing equals() here, so don't use assertEquals(), but call equal() directly
 
         assertTrue(gr.equals(gr));
         assertTrue(gr.equals(gr2));
@@ -115,12 +117,16 @@ class GeneratorRequestTest {
     @Test
     void testInvalidConstruction() {
 
-        assertThrows(NullPointerException.class, () -> new GeneratorRequest(null, OUT, "pkg", "test/test.xml", false, ""));
-        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, null, "pkg", "test/test.xml", false, ""));
+        assertThrows(NullPointerException.class,
+                () -> new GeneratorRequest(null, OUT, "pkg", "test/test.xml", false, ""));
+        assertThrows(NullPointerException.class,
+                () -> new GeneratorRequest(IN, null, "pkg", "test/test.xml", false, ""));
         assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, null, "test/test.xml", false, ""));
         assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, "pkg", null, false, ""));
-        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, "pkg", "test/test.xml", false, null));
-        assertThrows(IllegalArgumentException.class, () -> new GeneratorRequest(IN, OUT, "", "test/test.xml", false, ""));
+        assertThrows(NullPointerException.class,
+                () -> new GeneratorRequest(IN, OUT, "pkg", "test/test.xml", false, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> new GeneratorRequest(IN, OUT, "", "test/test.xml", false, ""));
         assertThrows(IllegalArgumentException.class,
                 () -> new GeneratorRequest(IN, OUT, "   ", "test/test.xml", false, ""));
 

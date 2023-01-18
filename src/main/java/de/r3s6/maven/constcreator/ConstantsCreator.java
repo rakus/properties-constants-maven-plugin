@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -232,8 +234,14 @@ public class ConstantsCreator extends AbstractMojo {
             final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
                     flattenPackage, classNameSuffix);
             if (gr.getJavaFile().exists()) {
-                gr.getJavaFile().delete();
-                buildContext.refresh(gr.getJavaFile());
+                try {
+                    Files.delete(gr.getJavaFile().toPath());
+                    buildContext.refresh(gr.getJavaFile());
+                } catch (NoSuchFileException e) {
+                    // IGNORED: file was already gone -- fine
+                } catch (IOException e) {
+                    addError(gr.getJavaFile(), 0, 0, "Could not delete: " + gr.getJavaFile() + " (" + e.getMessage() + ")", e);
+                }
             }
         }
     }

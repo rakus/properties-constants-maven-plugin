@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -69,4 +70,26 @@ public class OrderedProperties extends Properties {
         }
     }
 
+    @Override
+    public synchronized int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(keySet);
+        return result;
+    }
+
+    @Override
+    public synchronized boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OrderedProperties other = (OrderedProperties) obj;
+        return Objects.equals(keySet, other.keySet) && super.equals(obj);
+    }
 }

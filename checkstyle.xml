@@ -92,11 +92,6 @@
         <module name="JavadocMissingWhitespaceAfterAsterisk" />
         <module name="NonEmptyAtclauseDescription" />
         <module name="RequireEmptyLineBeforeBlockTagGroup" />
-        <!--
-        <module name="JavadocParagraph">
-            <property name="allowNewlineParagraph" value="false" />
-        </module>
-        -->
         <module name="JavadocStyle">
             <property name="checkEmptyJavadoc" value="true" />
         </module>
@@ -141,27 +136,14 @@
         <!--======[ Naming ]================================================ -->
         <module name="ConstantName" />
 
-        <module name="MemberName">
-            <!-- <property name="format" value="^m[A-Z][A-Za-z0-9]*$" /> -->
-        </module>
-        <module name="StaticVariableName">
-            <!-- <property name="format" value="^s[A-Z][A-Za-z0-9]*$" /> -->
-        </module>
+        <module name="MemberName" />
+        <module name="StaticVariableName" />
 
         <!-- As the prefix notation was added above, we need to check that
             local vars and parameter are not look similar. -->
-        <module name="LocalFinalVariableName">
-            <!-- <property name="format" value="(^[a-z]$)|(^(([a-ln-rt-z][A-Z])|([a-z][a-z0-9]))[A-Za-z0-9]*$)"
-                /> -->
-        </module>
-        <module name="ParameterName">
-            <!-- <property name="format" value="(^[a-z]$)|(^(([a-ln-rt-z][A-Z])|([a-z][a-z0-9]))[A-Za-z0-9]*$)"
-                /> -->
-        </module>
-        <module name="LocalVariableName">
-            <!-- <property name="format" value="(^[a-z]$)|(^(([a-ln-rt-z][A-Z])|([a-z][a-z0-9]))[A-Za-z0-9]*$)"
-                /> -->
-        </module>
+        <module name="LocalFinalVariableName" />
+        <module name="ParameterName" />
+        <module name="LocalVariableName" />
 
         <module name="MethodName" />
         <module name="PackageName" />
