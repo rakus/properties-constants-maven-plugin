@@ -1,0 +1,37 @@
+
+name: GitHub Packages Upload
+
+on:
+  push:
+    branches: [master]
+
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup JDK 8
+        uses: actions/setup-java@v3
+        with:
+         java-version: 8
+         distribution: 'temurin'
+         cache: maven
+         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+         settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+      - name: Maven Build
+        run: mvn -B clean verify -Pit
+
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+
