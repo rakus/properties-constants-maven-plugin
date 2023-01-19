@@ -159,16 +159,11 @@ public class ConstantsCreator extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        tmplHandler = new TemplateHandler(project);
+        checkConfig();
 
         if (!skip) {
-            if (!SourceVersion.isName(basePackage)) {
-                throw new MojoExecutionException("Configured basePackage \"" + basePackage + "\" is invalid.");
-            }
 
-            if (classNameSuffix.length() != 0 && !SourceVersion.isIdentifier(classNameSuffix)) {
-                throw new MojoExecutionException("Configured classNameSuffix \"" + classNameSuffix + "\" is invalid.");
-            }
+            tmplHandler = new TemplateHandler(project);
 
             cleanupDeletes();
 
@@ -196,6 +191,23 @@ public class ConstantsCreator extends AbstractMojo {
 
         if (!errorMessages.isEmpty()) {
             throw new MojoExecutionException(errorMessages.stream().collect(Collectors.joining("\n")));
+        }
+    }
+
+    private void checkConfig() throws MojoExecutionException {
+        if (!SourceVersion.isName(basePackage)) {
+            throw new MojoExecutionException("Configured basePackage \"" + basePackage + "\" is invalid.");
+        }
+
+        if (classNameSuffix.length() != 0 && !SourceVersion.isIdentifier(classNameSuffix)) {
+            throw new MojoExecutionException("Configured classNameSuffix \"" + classNameSuffix + "\" is invalid.");
+        }
+
+        if (!resourceDir.exists()) {
+            throw new MojoExecutionException("Configured resourceDir \"" + resourceDir + "\" does not exist.");
+        }
+        if (!resourceDir.isDirectory()) {
+            throw new MojoExecutionException("Configured resourceDir \"" + resourceDir + "\" is not a directory.");
         }
     }
 
