@@ -27,7 +27,7 @@
 
     <groupId>de.r3s6.maven</groupId>
     <artifactId>properties-constants-maven-plugin</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>Properties Constants Creator Maven Plugin</name>
