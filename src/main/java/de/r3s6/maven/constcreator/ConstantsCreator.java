@@ -47,6 +47,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import freemarker.core.ParseException;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
 
@@ -178,6 +179,8 @@ public class ConstantsCreator extends AbstractMojo {
 
         if (!skip) {
 
+            checkResourceDir();
+
             tmplHandler = new TemplateHandler(project);
 
             cleanupDeletes();
@@ -217,10 +220,14 @@ public class ConstantsCreator extends AbstractMojo {
         if (classNameSuffix.length() != 0 && !SourceVersion.isIdentifier(classNameSuffix)) {
             throw new MojoExecutionException("Configured classNameSuffix \"" + classNameSuffix + "\" is invalid.");
         }
+    }
+
+    private void checkResourceDir() throws MojoExecutionException {
 
         if (!resourceDir.exists()) {
             throw new MojoExecutionException("Configured resourceDir \"" + resourceDir + "\" does not exist.");
         }
+
         if (!resourceDir.isDirectory()) {
             throw new MojoExecutionException("Configured resourceDir \"" + resourceDir + "\" is not a directory.");
         }
@@ -252,6 +259,9 @@ public class ConstantsCreator extends AbstractMojo {
     }
 
     private void cleanupDeletes() {
+        /*
+         * The delete scanner will only find something when run within Eclipse.
+         */
         final Scanner scanner = buildContext.newDeleteScanner(resourceDir);
         scanner.setIncludes(includes);
         scanner.setExcludes(excludes);
@@ -267,7 +277,8 @@ public class ConstantsCreator extends AbstractMojo {
                 } catch (NoSuchFileException e) {
                     // IGNORED: file was already gone -- fine
                 } catch (IOException e) {
-                    addError(gr.getJavaFile(), 0, 0, "Could not delete: " + gr.getJavaFile() + " (" + e.getMessage() + ")", e);
+                    addError(gr.getJavaFile(), 0, 0,
+                            "Could not delete: " + gr.getJavaFile() + " (" + e.getMessage() + ")", e);
                 }
             }
         }
@@ -304,12 +315,15 @@ public class ConstantsCreator extends AbstractMojo {
             createStringConstants(genReq, entries, javaFile);
         } catch (TemplateNotFoundException e) {
             throw new MojoExecutionException("Code template not found: " + e.getTemplateName(), e);
+        } catch (final ParseException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         } catch (final IOException e) {
             addError(genReq.getPropertiesFile(), 0, 0,
                     "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
         } catch (TemplateException e) {
             final String tmplName = e.getEnvironment().getMainTemplate().getName();
-            throw new MojoExecutionException("Code template not found: " + tmplName + " (" + e.getMessage() + ")", e);
+            throw new MojoExecutionException("Error in template processing: " + tmplName + " (" + e.getMessage() + ")",
+                    e);
         }
     }
 
