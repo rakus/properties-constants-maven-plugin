@@ -52,6 +52,7 @@
 
         <junit.version>5.9.1</junit.version>
         <mockito.version>4.11.0</mockito.version>
+        <jacoco.version>0.8.8</jacoco.version>
         <itf-jupiter-extension.version>0.12.0</itf-jupiter-extension.version>
         <assertj-core.version>3.24.2</assertj-core.version>
         <maven-failsafe-plugin.version>3.0.0-M8</maven-failsafe-plugin.version>
@@ -59,7 +60,9 @@
         <!-- don't lookup dependencies for project-info-report. Speeds up build. -->
         <dependency.locations.enabled>false</dependency.locations.enabled>
 
-        <surefire.jacoco></surefire.jacoco>
+        <surefireArgLine></surefireArgLine>
+        <failsafeArgLine></failsafeArgLine>
+        <jacoco.maven.opts></jacoco.maven.opts>
     </properties>
 
     <developers>
@@ -73,6 +76,7 @@
             </roles>
         </developer>
     </developers>
+
 
     <licenses>
         <license>
@@ -409,6 +413,9 @@
                             <maven.version>${maven.version}</maven.version>
                             <maven.home>${maven.home}</maven.home>
                         </systemProperties>
+                        <environmentVariables>
+                            <MAVEN_OPTS>${jacoco.maven.opts}</MAVEN_OPTS>
+                        </environmentVariables>
                         <properties>
                             <!--
                             <configurationParameters>
@@ -439,6 +446,7 @@
             <unit.coverage.file>${project.build.directory}/coverage-reports/jacoco-unit.exec</unit.coverage.file>
             <it.coverage.file>${project.build.directory}/coverage-reports/jacoco-it.exec</it.coverage.file>
             <merged.coverage.file>${project.build.directory}/coverage-reports/jacoco-merged.exec</merged.coverage.file>
+            <jacoco.maven.opts>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${it.coverage.file},append=true</jacoco.maven.opts>
         </properties>
         <build>
             <plugins>
@@ -446,7 +454,7 @@
                     <!-- https://www.eclemma.org/jacoco/trunk/doc/maven.html -->
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.8</version>
+                    <version>${jacoco.version}</version>
                     <executions>
                         <execution>
                             <goals>
