@@ -30,6 +30,7 @@ import com.soebes.itf.jupiter.maven.MavenExecutionResult;
 @MavenRepository
 @MavenOption(MavenCLIOptions.BATCH_MODE)
 @MavenGoal("generate-sources")
+@MavenOption(value=MavenCLIOptions.SETTINGS, parameter = "settings.xml")
 public class FailureHandlingIT {
 
     @MavenTest

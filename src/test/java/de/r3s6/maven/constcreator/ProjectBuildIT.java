@@ -29,6 +29,7 @@ import com.soebes.itf.jupiter.maven.MavenExecutionResult;
 @MavenJupiterExtension
 @MavenRepository
 @MavenOption(MavenCLIOptions.BATCH_MODE)
+@MavenOption(value=MavenCLIOptions.SETTINGS, parameter = "settings.xml")
 public class ProjectBuildIT {
 
     /**
