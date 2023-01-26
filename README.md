@@ -55,7 +55,7 @@ public final class Messages {
     public final static String GOODBY_USER = "goodby.user";
 
     /** Hidden constructor. */
-    private LabelsSimple() {
+    private Messages() {
         // nothing to instantiate
     }
 
