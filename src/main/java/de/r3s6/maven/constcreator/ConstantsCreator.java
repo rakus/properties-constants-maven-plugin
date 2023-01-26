@@ -64,9 +64,12 @@ public class ConstantsCreator extends AbstractMojo {
      */
     private static final Pattern SMALL_BIG = Pattern.compile("([a-z])([A-Z])");
 
+
     private static final String KEYS_TEMPLATE_ID = "keys";
     private static final String VALUES_TEMPLATE_ID = "values";
     private static final String DEFAULT_TEMPLATE_ID = KEYS_TEMPLATE_ID;
+
+    private static final String KEY_TEMPLATE_FMT = "plugin-default-templates/%s-template.ftl";
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -337,7 +340,7 @@ public class ConstantsCreator extends AbstractMojo {
         switch (this.template) {
         case KEYS_TEMPLATE_ID:
         case VALUES_TEMPLATE_ID:
-            templateFile = this.template + ".ftl";
+            templateFile =  String.format(KEY_TEMPLATE_FMT, this.template);
             break;
 
         default:
