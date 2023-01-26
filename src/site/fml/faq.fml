@@ -24,6 +24,58 @@
     <part id="plugin">
         <title>The Properties Constants Maven Plugin</title>
 
+        <faq id="is.this.a.good.idea">
+            <question>Is creating constants for properties key a good idea at all?</question>
+            <answer>
+                <p>Well, it depends.</p>
+                <p>This helps the developers to check at compile time whether the
+                properties key is valid or not (assuming he/she uses the constant with the right
+                    properties file).</p>
+                <p>While this is useful, it might depend on the size of the properties file. If it
+                contains hundreds or even thousands of entries, I'm not sure whether it is a good
+                    idea to create a Java class containing that number of String constants.</p>
+                <p>So: Make you own judgment whether this plugin is a good idea for your use case
+                or your specific context.</p>
+            </answer>
+        </faq>
+        <faq id="size.limit">
+            <question>Is there a limit for the number of constants in a class?</question>
+            <answer>
+                <p>I don't know, but I wouldn't be surprised.</p>
+                <p>For testing a properties file with 20000 entries was created and a class with
+                constants was generated for it. Each property key was 44 chars long. The generated
+                    Java source code had 100080 lines and the compiled class file was 2 MB.</p>
+                <p>This worked with Java 8, 11 and 17.</p>
+                <p>Anyway, creating a constants class of this size is most likely not a good idea.</p>
+            </answer>
+        </faq>
+        <faq id="central.custom.template">
+            <question>How can I use a centralized custom template for all of my projects?</question>
+            <answer>
+                <p>Do it with a Maven dependency.</p>
+                <p>Create a jar that only contains your Freemarker template and deploy it to your
+                    local Maven repository.</p>
+                <p>Then configure the plugin like this:</p>
+                <source>
+&lt;plugin&gt;
+  &lt;groupId&gt;de.r3s6.maven&lt;/groupId&gt;
+  &lt;artifactId&gt;properties-constants-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;${properties-constants-maven-plugin.version}&lt;/version&gt;
+  &lt;configuration&gt;
+    &lt;basePackage&gt;com.example.constants&lt;/basePackage&gt;
+    &lt;template&gt;my-custom-template.ftl&lt;/template&gt;
+  &lt;/configuration&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;com.example.constants&lt;/groupId&gt;
+      &lt;artifactId&gt;prop-const-template&lt;/artifactId&gt;
+      &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/plugin&gt;</source>
+            </answer>
+
+        </faq>
         <faq id="xml.properties">
             <question>
                 Does the <code>properties-constants-maven-plugin</code> support XML properties?
@@ -48,12 +100,12 @@
                 See <a href="#xml.resourcebundle">this question</a></p>
             </answer>
         </faq>
-        <faq id="file extensions">
+        <faq id="file.extensions">
             <question>Which file extensions are required?</question>
             <answer>
-            <p>The file extension is not relevant for the plugin. Files with the extension
-            <code>xml</code> (case insensitive) are read as XML. All other extensions are handled
-            like <code>*.properties</code>.</p>
+                <p>The plugin only cares whether the file has the extension <code>xml</code> or not.
+                Files with the extension <code>xml</code> (case insensitive) are read as XML.
+                All other extensions are handled like <code>*.properties</code>.</p>
             </answer>
         </faq>
         <faq id="load.failed">
@@ -97,17 +149,6 @@
                 UTF-8. See the javadoc of <code>java.util.PropertyResourceBundle</code>.</p>
             </answer>
         </faq>
-        <faq id="xml.resourcebundle">
-            <question>How can I load a ResourceBundle from a XML file?</question>
-            <answer>
-                <p>This is not supported by default but can be implemented by extending
-                <code>ResourceBundle.Control</code> and implementing <code>ResourceBundleControlProvider</code>
-                and a <code>ServiceLoader</code> config.</p>
-                <p>For Java8 this is explained in this
-                <a href="https://docs.oracle.com/javase/tutorial/i18n/serviceproviders/resourcebundlecontrolprovider.html">Java Tutorial</a>.</p>
-            </answer>
-        </faq>
     </part>
-
 
 </faqs>
