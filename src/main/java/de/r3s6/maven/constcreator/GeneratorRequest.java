@@ -78,12 +78,14 @@ public final class GeneratorRequest {
             throw new IllegalArgumentException("Empty package name not supported");
         }
 
-        this.propertyFileName = propFileName;
+        final String portableFileName = propFileName.replace('\\', '/');
 
-        this.xmlProperties = propFileName.toLowerCase().endsWith(".xml");
+        this.propertyFileName = portableFileName;
+
+        this.xmlProperties = portableFileName.toLowerCase().endsWith(".xml");
 
         // remove extension and locale stuff
-        this.bundleName = propFileName.replaceAll("\\.[^.]*$", "").replaceAll("_[a-z][a-z](_[A-Z][A-Z])?$", "");
+        this.bundleName = portableFileName.replaceAll("\\.[^.]*$", "").replaceAll("_[a-z][a-z](_[A-Z][A-Z])?$", "");
 
         // concat and replace file separators
         final String fqName;
@@ -172,8 +174,8 @@ public final class GeneratorRequest {
     /**
      * The resource bundle name.
      * <p>
-     * This is the file name of the properties file with extension and locale marker
-     * (e.g "_en") removed.
+     * This is the file name of the properties file with extension and locale
+     * marker (e.g "_en") removed.
      * <p>
      * E.g. {@code dir/messages_en_US.properties} becomes {@code dir/messages}.
      *

@@ -17,7 +17,7 @@
 buildLogFile = new File(basedir, "build.log")
 buildLogText = buildLogFile.text
 
-assert buildLogText =~ /Configured resourceDir "[^"]*\/pom.xml" is not a directory./ : "Not existing resourceDir not detected"
+assert buildLogText =~ /Configured resourceDir "[^"]*pom.xml" is not a directory./ : "Not existing resourceDir not detected"
 
 println "Test OK"
 

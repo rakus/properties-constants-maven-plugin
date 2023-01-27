@@ -18,7 +18,7 @@ buildLogFile = new File(basedir, "build.log")
 buildLogText = buildLogFile.text
 
 // assert buildLogText.contains("Configured resourceDir \"src/main/resources\" does not exist.") : "Not existing resourceDir not detected"
-assert buildLogText =~ /Configured resourceDir "[^"]*src\/main\/resources" does not exist./ : "Not existing resourceDir not detected"
+assert buildLogText =~ /Configured resourceDir "[^"]*src.main.resources" does not exist./ : "Not existing resourceDir not detected"
 
 println "Test OK"
 
