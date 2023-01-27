@@ -57,7 +57,7 @@ import freemarker.template.TemplateNotFoundException;
  * @author Ralf Schandl
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class ConstantsCreator extends AbstractMojo {
+public class GenerateMojo extends AbstractMojo {
 
     /**
      * Pattern to match the transition from lowercase to uppercase characters.
