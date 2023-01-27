@@ -56,23 +56,23 @@
                 <p>Create a jar that only contains your Freemarker template and deploy it to your
                     local Maven repository.</p>
                 <p>Then configure the plugin like this:</p>
-                <source>
-&lt;plugin&gt;
-  &lt;groupId&gt;de.r3s6.maven&lt;/groupId&gt;
-  &lt;artifactId&gt;properties-constants-maven-plugin&lt;/artifactId&gt;
-  &lt;version&gt;${properties-constants-maven-plugin.version}&lt;/version&gt;
-  &lt;configuration&gt;
-    &lt;basePackage&gt;com.example.constants&lt;/basePackage&gt;
-    &lt;template&gt;my-custom-template.ftl&lt;/template&gt;
-  &lt;/configuration&gt;
-  &lt;dependencies&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;com.example.constants&lt;/groupId&gt;
-      &lt;artifactId&gt;prop-const-template&lt;/artifactId&gt;
-      &lt;version&gt;1.0.0&lt;/version&gt;
-    &lt;/dependency&gt;
-  &lt;/dependencies&gt;
-&lt;/plugin&gt;</source>
+                <source><![CDATA[
+<plugin>
+  <groupId>de.r3s6.maven</groupId>
+  <artifactId>properties-constants-maven-plugin</artifactId>
+  <version>${properties-constants-maven-plugin.version}</version>
+  <configuration>
+    <basePackage>com.example.constants</basePackage>
+    <template>my-custom-template.ftl</template>
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.example.constants</groupId>
+      <artifactId>prop-const-template</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+</plugin>]]></source>
             </answer>
 
         </faq>
@@ -88,10 +88,10 @@
                 <p>To include XML files use the configuration option <code>&lt;includes&gt;</code>
                 like:
                 </p>
-                <source>
-&lt;includes&gt;
-    &lt;include&gt;*.xml&lt;include&gt;
-&lt;/includes&gt;</source>
+                <source><![CDATA[
+<includes>
+  <include>*.xml</include>
+</includes>]]></source>
 
                 <p> Note that the content must comply to the simple
                 <a href="http://java.sun.com/dtd/properties.dtd">Properties DTD</a>.
@@ -122,11 +122,13 @@
             generated Java code is relative to the configuration option <code>&lt;resourceDir&gt;</code>.
             If the properties files to translate are located in <code>src/main/resources/messages</code>,
             the plugin needs following configuration:</p>
-                <source>
-&lt;resourceDir&gt;src/main/resources&gt;   &lt;!-- the default --&gt;
-&lt;includes&gt;
-    &lt;include&gt;messages/*.properties&lt;include&gt;
-&lt;/includes&gt;</source>
+        <source><![CDATA[
+<configuration>
+  <resourceDir>src/main/resources</resourceDir>   <!-- the default -->
+  <includes>
+    <include>messages/*.properties</include>
+  </includes>
+</configuration>]]></source>
             <p>Then the path to the properties in the generated Java file is <code>messages/xyz.properties</code>
             and loading works.</p>
             </answer>
