@@ -80,7 +80,7 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Whether to skip the plugin execution.
      */
-    @Parameter(property = "const-creator.skip")
+    @Parameter(property = "properties-constants.skip")
     private boolean skip;
 
     /**

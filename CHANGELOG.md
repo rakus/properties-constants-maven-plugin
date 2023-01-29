@@ -15,7 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-* Added CI build with Windows
+* CI build with Windows
+
+### Changed
+
+* Property to skip is now `properties-constants.skip`
 
 
 ## [0.2.0] - 2023-01-20
