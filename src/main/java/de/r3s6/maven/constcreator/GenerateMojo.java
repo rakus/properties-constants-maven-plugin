@@ -281,7 +281,7 @@ public class GenerateMojo extends AbstractMojo {
                     // IGNORED: file was already gone -- fine
                 } catch (IOException e) {
                     addError(gr.getJavaFile(), 0, 0,
-                            "Could not delete: " + gr.getJavaFile() + " (" + e.getMessage() + ")", e);
+                            "Could not delete: " + gr.getJavaFile() + " (" + e + ")", e);
                 }
             }
         }

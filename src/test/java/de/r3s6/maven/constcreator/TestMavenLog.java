@@ -55,17 +55,23 @@ class TestMavenLog implements Log {
                 return;
             }
         }
-        throw new AssertionError("Pattern \"" + regex + "\" not found in output");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pattern \"" + regex + "\" not found in output:\n");
+        sb.append(String.join("\n", lines));
+        throw new AssertionError(sb.toString());
     }
 
     public void assertContainsSubString(final String text) {
 
         for (String string : lines) {
-            if(string.indexOf(text) >= 0) {
+            if(string.contains(text)) {
                 return;
             }
         }
-        throw new AssertionError("Substring \"" + text + "\" not found in output");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Substring \"" + text + "\" not found in output:\n");
+        sb.append(String.join("\n", lines));
+        throw new AssertionError(sb.toString());
     }
 
 
