@@ -41,7 +41,16 @@ If a custom template should be used, it might be useful to first have a look
 into the [Freemarker documentation], especially the section "Template Author's
 Guide".
 
-The important part for the template author is to know the data model.
+The plugin assumes that the templates character encoding is the same as was
+configured for source file to generate (property `sourceEncoding`, which defaults
+to `${project.build.sourceEncoding}`).
+
+If the template uses a different encoding (or just to be explicit), it should
+start with a ftl directive defining the character encoding. Like:
+
+```
+<#ftl encoding="utf-8">
+```
 
 ### The Data Model
 
@@ -64,7 +73,7 @@ The model used for Freemarker templates contain the following fields:
 
 The data model contains the field `entry` that is a list of `Entry` objects.
 Every `Entry` object represents an entry from the properties file for which a
-constant should be created.  It contains the following field:
+constant should be created. It contains the following field:
 
 * `key`: The key from the properties file entry.
 * `value`: The value from the properties file entry.
@@ -112,7 +121,7 @@ that they might be unset (aka `null`).  The simplest way is to define a boolean
 variable in the context of the template:
 
 ```
-<#assign genLoadProperties        = ((options.genLoadProperties!"false") == "true")>
+<#assign genLoadProperties = ((options.genLoadProperties!"false") == "true")>
 ...
 <#if genLoadProperties>
 ...
