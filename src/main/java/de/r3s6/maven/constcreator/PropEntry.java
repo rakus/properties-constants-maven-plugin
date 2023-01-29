@@ -48,7 +48,7 @@ public class PropEntry {
      * @throws IllegalArgumentException when key is invalid (e.g. empty)
      */
     public PropEntry(final String key, final String value) {
-        Objects.requireNonNull(key);
+        Objects.requireNonNull(key, "PropEntry.key must not be null");
         this.key = key.trim();
         if (this.key.length() == 0) {
             throw new IllegalArgumentException("empty key");

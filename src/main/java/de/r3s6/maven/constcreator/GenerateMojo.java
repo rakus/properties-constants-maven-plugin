@@ -184,7 +184,7 @@ public class GenerateMojo extends AbstractMojo {
 
             checkResourceDir();
 
-            tmplHandler = new TemplateHandler(project);
+            tmplHandler = new TemplateHandler(project.getBasedir(), sourceEncoding);
 
             cleanupDeletes();
 

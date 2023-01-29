@@ -16,6 +16,7 @@ package de.r3s6.maven.constcreator;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -107,4 +108,16 @@ class PropEntryTest {
         assertEquals("getTestCase", entry.getGetterName());
     }
 
+    @Test
+    void testEmptyKeyException() {
+       IllegalArgumentException thr =  assertThrows(IllegalArgumentException.class, () -> new PropEntry("", "one"));
+
+       assertEquals("empty key", thr.getMessage());
+    }
+
+    @Test
+    void testNullKeyException() {
+       NullPointerException thr =  assertThrows(NullPointerException.class, () -> new PropEntry(null, "one"));
+       assertEquals("PropEntry.key must not be null", thr.getMessage());
+    }
 }

@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.apache.maven.project.MavenProject;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -43,10 +41,10 @@ public class TemplateHandler {
 
     private Configuration configuration = new Configuration(FREEMARKER_VERSION);
 
-    TemplateHandler(final MavenProject project) {
+    TemplateHandler(final File projectBasedir, final String encoding) {
 
         configuration.setObjectWrapper(new DefaultObjectWrapper(FREEMARKER_VERSION));
-        configuration.setDefaultEncoding("UTF-8");
+        configuration.setDefaultEncoding(encoding);
         configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         configuration.setIncompatibleImprovements(FREEMARKER_VERSION);
 
@@ -54,7 +52,7 @@ public class TemplateHandler {
         final FileTemplateLoader projectTl;
         final FileTemplateLoader absolutTl;
         try {
-            projectTl = new FileTemplateLoader(project.getBasedir());
+            projectTl = new FileTemplateLoader(projectBasedir);
             absolutTl = new FileTemplateLoader(new File("/"));
         } catch (IOException e) {
             // should not be reached. The project basedir and the root dir should always
