@@ -42,9 +42,9 @@
             <question>Is there a limit for the number of constants in a class?</question>
             <answer>
                 <p>I don't know, but I wouldn't be surprised.</p>
-                <p>For testing a properties file with 20000 entries was created and a class with
-                constants was generated for it. Each property key was 44 chars long. The generated
-                    Java source code had 100080 lines and the compiled class file was 2 MB.</p>
+                <p>For testing a properties file with 20,000 entries was created with each key being
+                44 chars long and every value 106. The Java source generated from this file had
+                    100,080 lines and the compiled class file was about 2.2 MB.</p>
                 <p>This worked with Java 8, 11 and 17.</p>
                 <p>Anyway, creating a constants class of this size is most likely not a good idea.</p>
             </answer>
