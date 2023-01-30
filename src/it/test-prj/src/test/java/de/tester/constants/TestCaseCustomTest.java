@@ -1,6 +1,6 @@
 package de.tester.constants;
 /*
- * Copyright 2021 Ralf Schandl
+ * Copyright 2023 Ralf Schandl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
