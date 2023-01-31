@@ -30,7 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.lang.model.SourceVersion;
@@ -58,12 +57,6 @@ import freemarker.template.TemplateNotFoundException;
  */
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class GenerateMojo extends AbstractMojo {
-
-    /**
-     * Pattern to match the transition from lowercase to uppercase characters.
-     */
-    private static final Pattern SMALL_BIG = Pattern.compile("([a-z])([A-Z])");
-
 
     private static final String KEYS_TEMPLATE_ID = "keys";
     private static final String VALUES_TEMPLATE_ID = "values";
@@ -385,38 +378,5 @@ public class GenerateMojo extends AbstractMojo {
 
         buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, thr);
         errorMessages.add(String.format("%s[%d:%d] %s", file.getPath(), line, column, message));
-    }
-
-    /**
-     * Translates a property key to a Java constant name.
-     *
-     * @param k the property key
-     * @return the constant name, upper snake case
-     */
-    static String keyToConstant(final String k) {
-        final String c = SMALL_BIG.matcher(k.trim()).replaceAll("$1_$2").toUpperCase();
-
-        final StringBuilder sb = new StringBuilder();
-
-        char chr = c.charAt(0);
-        if (Character.isJavaIdentifierStart(chr)) {
-            sb.append(chr);
-        } else {
-            sb.append("_");
-            if (Character.isJavaIdentifierPart(chr)) {
-                sb.append(chr);
-            }
-        }
-
-        for (int i = 1; i < c.length(); i++) {
-            chr = c.charAt(i);
-            if (Character.isJavaIdentifierPart(chr)) {
-                sb.append(chr);
-            } else {
-                sb.append("_");
-            }
-        }
-
-        return sb.toString();
     }
 }

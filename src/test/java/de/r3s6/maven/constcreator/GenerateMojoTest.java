@@ -471,39 +471,6 @@ class GenerateMojoTest {
         mavenLog.assertContainsSubString("[info] Skipped - skip == true");
     }
 
-    @Test
-    void testKey2Constant() {
-
-        assertEquals("TEST_CASE", GenerateMojo.keyToConstant("test.case"));
-        assertEquals("TEST__CASE", GenerateMojo.keyToConstant("test..Case"));
-        assertEquals("TEST____CASE", GenerateMojo.keyToConstant("test....Case"));
-
-        assertEquals("TEST_CASE", GenerateMojo.keyToConstant("test_case"));
-        assertEquals("TEST____CASE", GenerateMojo.keyToConstant("test____case"));
-
-        assertEquals("TEST_CASE", GenerateMojo.keyToConstant("test-case"));
-        assertEquals("TEST__CASE", GenerateMojo.keyToConstant("test--case"));
-
-        assertEquals("TEST___CASE", GenerateMojo.keyToConstant("test-._case"));
-
-        assertEquals("TEST_CASE", GenerateMojo.keyToConstant("testCase"));
-        assertEquals("TEST_CASE", GenerateMojo.keyToConstant("test Case"));
-        assertEquals("TEST____CASE", GenerateMojo.keyToConstant("test    Case"));
-
-        assertEquals("TEST____CASE", GenerateMojo.keyToConstant("   test    Case        "));
-
-        assertEquals("TEST_CASE_MESSAGE", GenerateMojo.keyToConstant("test.case.message"));
-
-        assertEquals("TEST$CASE", GenerateMojo.keyToConstant("test$case"));
-
-        assertEquals("ÄÖÜ_ÄÖÜSS", GenerateMojo.keyToConstant("ÄÖÜ_äöüß"));
-
-        assertEquals("_0ZERO", GenerateMojo.keyToConstant("0zero"));
-
-        assertEquals("_PERCENT", GenerateMojo.keyToConstant("%percent"));
-
-    }
-
     /**
      * Create GenerateMojo with basePackage and some base config.
      *
