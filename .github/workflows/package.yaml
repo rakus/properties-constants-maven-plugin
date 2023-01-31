@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: GitHub Packages Upload
+name: Deploy SNAPSHOT Packages to GitHub
 
 on:
   push:
@@ -22,7 +22,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    permissions:
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v3
+        name: "Checking out."
+      - uses: actions/setup-java@v3
+        with:
+         java-version: 8
+         distribution: 'temurin'
+         cache: maven
+
+      - name: Maven Build with integration test
+        run: mvn -B verify -Pit
+
   package:
+    needs: windows-build
     runs-on: ubuntu-latest
 
     permissions:
@@ -40,10 +59,19 @@ jobs:
          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
          settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+      - name: Extract Project version
+        id: project
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
+      - name: Echo Project Version
+        run: echo ${{ steps.project.outputs.version }}
+
       - name: Maven Build
+        if:  ${{ endsWith(steps.project.outputs.version, '-SNAPSHOT') }}
         run: mvn -B clean verify -Pit
 
       - name: Publish to GitHub Packages Apache Maven
+        if:  ${{ endsWith(steps.project.outputs.version, '-SNAPSHOT') }}
         run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}

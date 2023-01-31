@@ -23,7 +23,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  windows-build:
+    runs-on: windows-latest
+
+    permissions:
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v3
+        name: "Checking out."
+      - uses: actions/setup-java@v3
+        with:
+         java-version: 8
+         distribution: 'temurin'
+         cache: maven
+
+      - name: Maven Build with integration test
+        run: mvn -B verify -Pit
+
   release-build:
+    needs: windows-build
     runs-on: ubuntu-latest
 
     permissions:
