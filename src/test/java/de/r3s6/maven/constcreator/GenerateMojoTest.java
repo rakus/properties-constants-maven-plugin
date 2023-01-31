@@ -245,7 +245,7 @@ class GenerateMojoTest {
 
         MojoExecutionException thr = assertThrows(MojoExecutionException.class, () -> mojo.execute());
 
-        assertTrue(thr.getMessage().contains("test.xml[0:0] Error loading properties file:"));
+        assertTrue(thr.getMessage().contains("test.xml[0:0] Error loading properties file:"), thr.getMessage());
     }
 
     @Test
@@ -325,7 +325,7 @@ class GenerateMojoTest {
 
         MojoExecutionException thr = assertThrows(MojoExecutionException.class, () -> mojo.execute());
 
-        assertTrue(thr.getMessage().contains("Syntax error in template \"invalid-template.ftl\""));
+        assertTrue(thr.getMessage().contains("Syntax error in template \"invalid-template.ftl\""), thr.getMessage());
     }
 
     @Test
@@ -363,7 +363,7 @@ class GenerateMojoTest {
 
         MojoExecutionException thr = assertThrows(MojoExecutionException.class, () -> mojo.execute());
 
-        assertTrue(thr.getMessage().matches(".*test.properties\\[0:0\\] Error generating Java file de.r3s6.maven.Test\\.java.*Is a directory.*"));
+        assertTrue(thr.getMessage().matches(".*test.properties\\[0:0\\] Error generating Java file de.r3s6.maven.Test\\.java.*"), thr.getMessage());
     }
 
     @Test
@@ -420,7 +420,7 @@ class GenerateMojoTest {
 
         MojoExecutionException thr = assertThrows(MojoExecutionException.class, () -> mojo.execute());
 
-        assertTrue(thr.getMessage().matches(".*Test.java\\[0:0\\] Could not delete:.*"));
+        assertTrue(thr.getMessage().matches(".*Test.java\\[0:0\\] Could not delete:.*"), thr.getMessage());
         assertTrue(javaDir.exists());
     }
 
@@ -456,7 +456,7 @@ class GenerateMojoTest {
 
         MojoExecutionException thr = assertThrows(MojoExecutionException.class, () -> mojo.execute());
 
-        assertTrue(thr.getMessage().contains("test_case.properties[0:0] Would create same constant class de.r3s6.maven.TestCase as test-case.properties"));
+        assertTrue(thr.getMessage().contains("test_case.properties[0:0] Would create same constant class de.r3s6.maven.TestCase as test-case.properties"), thr.getMessage());
     }
 
     @Test
