@@ -35,12 +35,12 @@ class XmlPropsTest {
 
     @Test
     void testPropertiesFilenameName() {
-        assertEquals("xml-props.xml", XmlProps.getPropertiesFilename());
+        assertEquals("xml-props.xml", XmlProps.PROPERTIES_FILE_NAME);
     }
 
     @Test
     void testPropertyLoad() throws IOException {
-        final Properties props = XmlProps.loadProperties();
+        final Properties props = ClasspathPropLoader.loadXmlProperties(XmlProps.PROPERTIES_FILE_NAME);
         assertEquals("test0001 value", props.getProperty(XmlProps.TEST0001));
         assertEquals("test0002 value", props.getProperty(XmlProps.TEST0002));
         assertEquals("test0003 value", props.getProperty(XmlProps.TEST0003));

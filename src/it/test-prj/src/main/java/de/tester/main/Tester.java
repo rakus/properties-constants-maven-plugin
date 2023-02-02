@@ -24,7 +24,7 @@ public class Tester {
 
     public static void main(final String[] args) throws IOException {
 
-        final ResourceBundle props = Messages.loadBundle();
+        final ResourceBundle props = ResourceBundle.getBundle(Messages.BUNDLE_NAME);;
 
         System.out.println(props.getString(Messages.WELCOME));
         System.out.println(props.getString(Messages._0SET));

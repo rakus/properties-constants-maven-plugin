@@ -16,9 +16,6 @@ properties. By configuration the class could be generated to contain constants
 holding the values from the properties file. In this case the properties file
 itself is not needed during runtime.
 
-If requested, the classes contain methods to load the properties file as
-`ResourceBundle` or `Properties`.
-
 In Eclipse the plugin goal `generate` is used as a build participant and runs on
 incremental and clean builds.
 
@@ -42,6 +39,11 @@ With the default template `keys` the following Java class will be generated.
  * @author properties-constants-maven-plugin
  */
 public final class Messages {
+
+    /**
+     * Properties file used to generate this class: "messages.properties".
+     */
+    public final static String PROPERTIES_FILE_NAME = "messages.properties";
 
     /**
      * Key of welcome=Welcome to Maven
@@ -85,88 +87,6 @@ public final class Messages {
     private Messages() {
         // nothing to instantiate
     }
-}
-```
-
-$H3 Additional Methods
-
-The default template `keys` supports template options to generate additional
-static methods in the generated class.
-
-Note that the template `values` does not support any template options.
-
-Option `genGetPropertiesFilename` adds a method to get the properties file name
-relative to the configured base directory:
-
-```java
-/**
- * Returns the filename of the properties file used to generate
- * this class.
- *
- * @return always "messages.properties"
- */
-public static String getPropertiesFilename() {
-    return "messages.properties";
-}
-```
-
-Option `genLoadProperties` adds a method to load the `Properties`:
-
-```java
-/**
- * Loads the properties file "messages.properties" from the classpath.
- * @return the loaded properties
- * @throws IOException if properties file not found or on load problems
- */
-public static Properties loadProperties() throws IOException {
-    final Properties properties = new Properties();
-    try (final InputStream stream = Messages.class.getResourceAsStream("/messages.properties")) {
-        if(stream == null) {
-            throw new IOException("Resource not found: messages.properties");
-        }
-        properties.load(stream);
-    }
-    return properties;
-}
-```
-
-Option `genGetBundleName` adds a method to get the bundle name. This is
-the properties file name excluding extension and possible locale marker.
-
-```java
-/**
- * Returns the bundle name - this is the properties file name
- * used to generate this class excluding extension and locale part.
- *
- * @return always "messages"
- */
-public static String getBundleName() {
-    return "messages";
-}
-```
-
-Option `genLoadBundle` adds methods to load the properties file as
-`ResourceBundle`.
-
-```java
-/**
- * Loads the resource bundle "messages" for the default locale.
- * @return the loaded bundle
- * @throws MissingResourceException if bundle couldn't be found
- */
-public static ResourceBundle loadBundle() {
-    return ResourceBundle.getBundle("messages");
-}
-
-/**
- * Loads the resource bundle "messages" for the given locale.
- * @param locale the locale to use
- * @return the loaded bundle
- * @throws MissingResourceException if bundle couldn't be found
- * @throws NullPointerException if locale is null
- */
-public static ResourceBundle loadBundle(final Locale locale) {
-    return ResourceBundle.getBundle("messages", locale);
 }
 ```
 

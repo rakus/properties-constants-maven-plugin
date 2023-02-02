@@ -34,17 +34,17 @@ class MessagesTest {
 
     @Test
     void testPropertiesFilenameName() {
-        assertEquals("messages/messages", Messages.getBundleName());
+        assertEquals("messages/messages", Messages.BUNDLE_NAME);
     }
 
     @Test
     void testPropertyLoad() throws IOException {
-        final ResourceBundle bdl = Messages.loadBundle(Locale.CHINESE);
+        final ResourceBundle bdl = ResourceBundle.getBundle(Messages.BUNDLE_NAME, Locale.CHINESE);
         assertEquals("Welcome to this test", bdl.getString(Messages.WELCOME));
         assertEquals("All zero", bdl.getString(Messages._0SET));
         assertEquals("Thanks for testing", bdl.getString(Messages.GOODBY));
 
-        final ResourceBundle bdlDe = Messages.loadBundle(Locale.GERMAN);
+        final ResourceBundle bdlDe = ResourceBundle.getBundle(Messages.BUNDLE_NAME, Locale.GERMAN);
         assertEquals("Willkommen zu diesem Test", bdlDe.getString(Messages.WELCOME));
         assertEquals("Alles Null", bdlDe.getString(Messages._0SET));
         assertEquals("Danke, dass Sie getestet haben", bdlDe.getString(Messages.GOODBY));

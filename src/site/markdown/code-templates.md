@@ -13,24 +13,60 @@ The template `keys` creates a Java class that contains String constants holding
 the property keys. This is useful to access the properties values at runtime.
 
 As this requires to load the properties as `Properties` or `ResourceBundle`,
-the template can be configured to create methods to load these. Examples for
-the created methods are shown in the [Introduction].
+the template provides a constant with the properties file name and if configured
+the resource bundle name.
 
-The following example enables ale possible options.
+### Options
 
+#### `genPropertiesFilenameConstant`
+Boolean (`true`/`false`), Default: `true`
+
+Adds the constant `PROPERTIES_FILE_NAME` to the generated class. This holds
+the name needed to load the properties file. The name of the constant can be
+changed with the option `propertiesFilenameConstant`.
+
+Typically `genPropertiesFilenameConstant` is set to `false` when
+`genBundleNameConstant` is `true`.
+
+#### `propertiesFilenameConstant`
+String, Default: `PROPERTIES_FILE_NAME`
+
+Name of the constant holding the properties file name. The value must be a
+valid Java variable name.
+
+#### `genBundleNameConstant`
+Boolean (`true`/`false`), Default: `false`
+
+Adds the constant `BUNDLE_NAME` to the generated class. This holds the bundle
+name; hence, the name of the properties file without extension and locale
+markers. The name of the constant can be changed with the option
+`bundleNameConstant`.
+
+Typically `genPropertiesFilenameConstant` is set to `false` when
+`genBundleNameConstant` is `true`.
+
+#### `bundleNameConstant`
+String, Default: `BUNDLE_NAME`
+
+Name of the constant holding the bundle name. The value must be a valid Java
+variable name.
+
+#### Example
+
+The following example shows the default configuration
 ```
 <templateOptions>
-    <genGetPropertiesFilename>true</genGetPropertiesFilename>
-    <genLoadProperties>true</genLoadProperties>
-    <genGetBundleName>true</genGetBundleName>
-    <genLoadBundle>true</genLoadBundle>
+    <genPropertiesFilenameConstant>true</genPropertiesFilenameConstant>
+    <propertiesFilenameConstant>PROPERTIES_FILE_NAME</propertiesFilenameConstant>
+    <genBundleNameConstant>false</genBundleNameConstant>
+    <bundleNameConstant>BUNDLE_NAME</bundleNameConstant>
 </templateOptions>
 ```
 
 ### Template `values`
 
 The template `values` creates a Java class that contains String constants holding
-the property values. Then the properties files itself are _not needed_ as runtime.
+the property values. Then the properties files itself are _not needed_ at runtime.
 
 This template does not support any additional options.
 
@@ -102,14 +138,14 @@ configured in the pom like:
 
 ```
 <templateOptions>
-    <genLoadProperties>true</genLoadProperties>
+    <addCopyright>true</addCopyright>
     <company>ACME</company>
 </templateOptions>
 ```
 
 This makes the following variables accessible in the template:
 
-* `${options.genLoadProperties}`
+* `${options.addCopyright}`
 * `${options.company}`
 
 Important: This are both of type `String`.
@@ -121,14 +157,13 @@ that they might be unset (aka `null`).  The simplest way is to define a boolean
 variable in the context of the template:
 
 ```
-<#assign genLoadProperties = ((options.genLoadProperties!"false") == "true")>
+<#assign addCopyright = ((options.addCopyright!"false") == "true")>
 ...
-<#if genLoadProperties>
+<#if addCopyright>
 ...
 </#if>
 ```
 
-[Introduction]: /index.html#
 [Freemarker]: https://freemarker.apache.org/
 [Freemarker documentation]: https://freemarker.apache.org/docs/index.html
 

@@ -150,15 +150,14 @@ public class GenerateMojo extends AbstractMojo {
      * <p>
      * The template <code>keys</code> supports the following options:
      * <dl>
-     * <dt>genGetPropertiesFilename</dt>
-     * <dd>generate the method <code>getPropertiesFilename()</code></dd>
-     * <dt>genLoadProperties</dt>
-     * <dd>generate the method <code>loadProperties()</code></dd>
-     * <dt>genGetBundleName</dt>
-     * <dd>generate the method <code>getBundleName()</code></dd>
-     * <dt>genLoadBundle</dt>
-     * <dd>generate the method <code>loadBundle()</code> and
-     * <code>loadBundle(Locale)</code></dd>
+     * <dt>genPropertiesFilenameConstant</dt>
+     * <dd>generate the constant <code>PROPERTIES_FILE_NAME()</code></dd>
+     * <dt>propertiesFilenameConstant</dt>
+     * <dd>changes the name of the properties file name constant</dd>
+     * <dt>genBundleNameConstant</dt>
+     * <dd>generate the constant <code>BUNDLE_NAME</code></dd>
+     * <dt>bundleNameConstant</dt>
+     * <dd>changes the name of the bundle name constant</dd>
      * </dl>
      */
     @Parameter

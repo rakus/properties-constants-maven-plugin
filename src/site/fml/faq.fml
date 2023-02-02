@@ -27,26 +27,29 @@
         <faq id="is.this.a.good.idea">
             <question>Is creating constants for properties key a good idea at all?</question>
             <answer>
-                <p>Well, it depends.</p>
-                <p>This helps the developers to check at compile time whether the
-                properties key is valid or not (assuming he/she uses the constant with the right
+                <p>Yes, this helps the developers to check at compile time whether the
+                properties key is valid or not (assuming the constants are used with the right
                     properties file).</p>
-                <p>While this is useful, it might depend on the size of the properties file. If it
-                contains hundreds or even thousands of entries, I'm not sure whether it is a good
-                    idea to create a Java class containing that number of String constants.</p>
-                <p>So: Make you own judgment whether this plugin is a good idea for your use case
-                or your specific context.</p>
+                <p>A common concern is about big properties files, e.g. for I18N they might contain
+                hundreds or more entries. The classes for this kind of properties files will be big
+                (or even huge). But that doesn't matter, as the Java compiler embeds the constant
+                values into the classes using them. The constant class itself is not loaded at
+                    runtime.</p>
+                <p>So, if the constants class is huge, it is a compile-time problem, not a runtime one.</p>
             </answer>
         </faq>
         <faq id="size.limit">
-            <question>Is there a limit for the number of constants in a class?</question>
+            <question>How big can a properties file be to work with the plugin?</question>
             <answer>
-                <p>I don't know, but I wouldn't be surprised.</p>
-                <p>For testing a properties file with 20,000 entries was created with each key being
-                44 chars long and every value 106. The Java source generated from this file had
-                    100,080 lines and the compiled class file was about 2.2 MB.</p>
-                <p>This worked with Java 8, 11 and 17.</p>
-                <p>Anyway, creating a constants class of this size is most likely not a good idea.</p>
+                <p>If using the default templates "keys", the maximum number of entries
+                in a properties file is 21838. This would result in a Java class with
+                21839 String constants, as an additional constant for the properties file
+                    name is created.</p>
+                <p>This is the maximum number of String constants a class can have, assuming all
+                constant values are different and the class has only the default constructor and
+                    no other method.</p>
+                <p>To understand this odd number, you might want to read up on the "constant pool"
+                    of the Java class file.</p>
             </answer>
         </faq>
         <faq id="central.custom.template">
@@ -55,7 +58,7 @@
                 <p>Do it with a Maven dependency.</p>
                 <p>Create a jar that only contains your Freemarker template and deploy it to your
                     local Maven repository.</p>
-                <p>Then configure the plugin like this:</p>
+                <p>Then configure the plugin similar to this:</p>
                 <source><![CDATA[
 <plugin>
   <groupId>de.r3s6.maven</groupId>
@@ -81,10 +84,7 @@
                 Does the <code>properties-constants-maven-plugin</code> support XML properties?
             </question>
             <answer>
-                <p>Yes, if the configuration also includes <code>*.xml</code> files, those files
-                are read using <code>Properties.loadFromXml()</code>.</p>
-                <p>If a constant class is created from an XML file, the loader method
-                <code>loadProperties()</code> also uses <code>loadFromXml()</code>.</p>
+                <p>Yes, if the configuration also includes <code>*.xml</code> files.</p>
                 <p>To include XML files use the configuration option <code>&lt;includes&gt;</code>
                 like:
                 </p>
@@ -96,8 +96,6 @@
                 <p> Note that the content must comply to the simple
                 <a href="http://java.sun.com/dtd/properties.dtd">Properties DTD</a>.
                 </p>
-                <p>Loading XML-Files as <code>ResourceBundle</code> is not supported out of the box.
-                See <a href="#xml.resourcebundle">this question</a></p>
             </answer>
         </faq>
         <faq id="file.extensions">
@@ -106,31 +104,6 @@
                 <p>The plugin only cares whether the file has the extension <code>xml</code> or not.
                 Files with the extension <code>xml</code> (case insensitive) are read as XML.
                 All other extensions are handled like <code>*.properties</code>.</p>
-            </answer>
-        </faq>
-        <faq id="load.failed">
-            <question>Load of Properties or ResourceBundle failed at runtime. Why?</question>
-            <answer>
-            <p>The generated static methods <code>loadProperties()</code> and <code>loadBundle(...)</code> use the
-            class loader to load the properties file. Prerequisites are:</p>
-            <ol>
-            <li>the properties file are added to the created jar and are available on the classpath</li>
-            <li>the configuration options <code>&lt;resourceDir&gt;</code> and <code>&lt;includes&gt;</code> are
-                used correctly</li>
-            </ol>
-            <p>The second point needs some explanation. The path to the properties file in the
-            generated Java code is relative to the configuration option <code>&lt;resourceDir&gt;</code>.
-            If the properties files to translate are located in <code>src/main/resources/messages</code>,
-            the plugin needs following configuration:</p>
-        <source><![CDATA[
-<configuration>
-  <resourceDir>src/main/resources</resourceDir>   <!-- the default -->
-  <includes>
-    <include>messages/*.properties</include>
-  </includes>
-</configuration>]]></source>
-            <p>Then the path to the properties in the generated Java file is <code>messages/xyz.properties</code>
-            and loading works.</p>
             </answer>
         </faq>
 

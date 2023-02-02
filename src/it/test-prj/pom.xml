@@ -74,10 +74,6 @@
                             <includes>
                                 <include>*.properties</include>
                             </includes>
-                            <templateOptions>
-                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                                <genLoadProperties>true</genLoadProperties>
-                            </templateOptions>
                         </configuration>
                     </execution>
                     <execution>
@@ -108,8 +104,8 @@
                                 <exclude>messages/*_??.properties</exclude>
                             </excludes>
                             <templateOptions>
-                                <genGetBundleName>true</genGetBundleName>
-                                <genLoadBundle>true</genLoadBundle>
+                                <genPropertiesFilenameConstant>true</genPropertiesFilenameConstant>
+                                <genBundleNameConstant>true</genBundleNameConstant>>
                             </templateOptions>
                         </configuration>
                     </execution>
@@ -123,10 +119,6 @@
                             <includes>
                                 <include>*.xml</include>
                             </includes>
-                            <templateOptions>
-                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                                <genLoadProperties>true</genLoadProperties>
-                            </templateOptions>
                         </configuration>
                     </execution>
                     <execution>
@@ -140,10 +132,6 @@
                                 <include>subdir/*.properties</include>
                             </includes>
                             <flattenPackage>true</flattenPackage>
-                            <templateOptions>
-                                <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                                <genLoadProperties>true</genLoadProperties>
-                            </templateOptions>
                         </configuration>
                     </execution>
                     <execution>

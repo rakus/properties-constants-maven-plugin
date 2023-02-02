@@ -21,7 +21,7 @@ The following diagram shows the default layout used by the properties-constants-
 $H2 Simple properties
 
 Reads `*.properties` files from `src/main/resources` and generates Java classes
-in the package `de.r3s6.constants`. Support methods for Properties are generated.
+in the package `de.r3s6.constants`.
 
 The default template "keys" is used.
 
@@ -40,10 +40,6 @@ The default template "keys" is used.
                     </goals>
                     <configuration>
                         <basePackage>de.r3s6.constants</basePackage>
-                        <templateOptions>
-                            <genGetPropertiesFilename>true</genGetPropertiesFilename>
-                            <genLoadProperties>true</genLoadProperties>
-                        </templateOptions>
                     </configuration>
                 </execution>
             </executions>
@@ -81,8 +77,9 @@ To create constants that contains property values, use the template "values".
 $H2 I18N - ResourceBundle
 
 Reads ResourceBundle properties files from `src/main/resources/i18n`. It ignores
-files with a locale marker (like `messages_en.properties`). Support methods for
-ResourceBundles are generated.
+files with a locale marker (like `messages_en.properties`). Instead of the constant
+holding the properties file name, a constant holding the bundle name is added to
+the generated class.
 
 ```xml
 <build>
@@ -100,8 +97,8 @@ ResourceBundles are generated.
                     <exclude>i18n/*_??.properties</exclude>
                 </excludes>
                 <templateOptions>
-                    <genGetBundleName>true</genGetBundleName>
-                    <genLoadBundle>true</genLoadBundle>
+                    <genPropertiesFilenameConstant>false</genPropertiesFilenameConstant>
+                    <genBundleNameConstant>true</genBundleNameConstant>
                 </templateOptions>
             </configuration>
             <executions>
