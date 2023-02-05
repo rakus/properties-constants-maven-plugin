@@ -14,22 +14,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<#assign genLoadBundle            = ((options.genLoadBundle!"false") == "true")>
-<#assign genLoadProperties        = ((options.genLoadProperties!"false") == "true")>
-<#assign genGetPropertiesFilename = ((options.genGetPropertiesFilename!"false") == "true")>
-<#assign genGetBundleName         = ((options.genGetBundleName!"false") == "true")>
+<#assign genPropertiesFilenameConstant = ((options.genPropertiesFilenameConstant!"true") == "true")>
+<#assign propertiesFilenameConstant    = options.propertiesFilenameConstant!"PROPERTIES_FILE_NAME">
+<#assign genBundleNameConstant         = ((options.genBundleNameConstant!"false") == "true")>
+<#assign bundleNameConstant            = options.bundleNameConstant!"BUNDLE_NAME">
 package ${pkgName};
-<#if genLoadBundle>
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-</#if>
-<#if genLoadProperties>
-
-import java.util.Properties;
-import java.io.IOException;
-import java.io.InputStream;
-</#if>
 
 /**
  * Constants for ${propertiesFileName}
@@ -39,6 +28,23 @@ import java.io.InputStream;
  * @author properties-constants-maven-plugin
  */
 public final class ${simpleClassName} {
+<#if genPropertiesFilenameConstant>
+
+    /**
+     * Properties file used to generate this class: "${propertiesFileName}".
+     * <p>
+     * If this name should be used to load the properties via classpath,
+     * a leading slash ('/') might be needed.
+     */
+    public final static String ${propertiesFilenameConstant} = "${propertiesFileName}";
+</#if>
+<#if genBundleNameConstant>
+
+    /**
+     * ResourceBundle used to generate this class: "${bundleName}"
+     */
+    public final static String ${bundleNameConstant} = "${bundleName}";
+</#if>
 <#list entries as entry>
 
     /**
@@ -51,73 +57,5 @@ public final class ${simpleClassName} {
     private ${simpleClassName}() {
         // nothing to instantiate
     }
-<#if genGetPropertiesFilename>
-
-    /**
-     * Returns the filename of the properties file used to generate
-     * this class.
-     *
-     * @return always "${propertiesFileName}"
-     */
-    public static String getPropertiesFilename() {
-        return "${propertiesFileName}";
-    }
-</#if>
-<#if genLoadProperties>
-
-    /**
-     * Loads the properties file "${propertiesFileName}" from the classpath.
-     * @return the loaded properties
-     * @throws IOException if properties file not found or on load problems
-     */
-    public static Properties loadProperties() throws IOException {
-        final Properties properties = new Properties();
-        try (final InputStream stream = ${simpleClassName}.class.getResourceAsStream("/${propertiesFileName}")) {
-            if(stream == null) {
-                throw new IOException("Resource not found: ${propertiesFileName}");
-            }
-<#if isXmlProperties>
-            properties.loadFromXML(stream);
-<#else>
-            properties.load(stream);
-</#if>
-        }
-        return properties;
-    }
-</#if>
-<#if genGetBundleName>
-
-    /**
-     * Returns the bundle name - this is the properties file name
-     * used to generate this class excluding extension and locale part.
-     *
-     * @return always "${bundleName}"
-     */
-    public static String getBundleName() {
-        return "${bundleName}";
-    }
-</#if>
-<#if genLoadBundle>
-
-    /**
-     * Loads the resource bundle "${bundleName}" for the default locale.
-     * @return the loaded bundle
-     * @throws MissingResourceException if bundle couldn't be found
-     */
-    public static ResourceBundle loadBundle() {
-        return ResourceBundle.getBundle("${bundleName}");
-    }
-
-    /**
-     * Loads the resource bundle "${bundleName}" for the given locale.
-     * @param locale the locale to use
-     * @return the loaded bundle
-     * @throws MissingResourceException if bundle couldn't be found
-     * @throws NullPointerException if locale is null
-     */
-    public static ResourceBundle loadBundle(final Locale locale) {
-        return ResourceBundle.getBundle("${bundleName}", locale);
-    }
-</#if>
 
 }

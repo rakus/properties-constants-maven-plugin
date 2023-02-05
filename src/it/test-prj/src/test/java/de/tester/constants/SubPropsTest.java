@@ -33,12 +33,12 @@ class SubPropsTest {
 
     @Test
     void testPropertiesFilenameName() {
-        assertEquals("subdir/sub-props.properties", SubProps.getPropertiesFilename());
+        assertEquals("subdir/sub-props.properties", SubProps.PROPERTIES_FILE_NAME);
     }
 
     @Test
     void testPropertyLoad() throws IOException {
-        final Properties props = SubProps.loadProperties();
+        final Properties props = ClasspathPropLoader.loadProperties(SubProps.PROPERTIES_FILE_NAME);
         assertEquals("First", props.getProperty(SubProps.ONE));
         assertEquals("Second", props.getProperty(SubProps.TWO));
         assertEquals("Third", props.getProperty(SubProps.THREE));

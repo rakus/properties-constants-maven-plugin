@@ -45,6 +45,14 @@ package de.r3s6.maven.example;
 public final class Messages {
 
     /**
+     * Properties file used to generate this class: "messages.properties".
+     * <p>
+     * If this name should be used to load the properties via classpath,
+     * a leading slash ('/') might be needed.
+     */
+    public final static String PROPERTIES_FILE_NAME = "messages.properties";
+
+    /**
      * Key of welcome.user=Hello user
      */
     public final static String WELCOME_USER = "welcome.user";

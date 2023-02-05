@@ -36,12 +36,12 @@ class TestCaseTest {
 
     @Test
     void testPropertiesFilenameName() {
-        assertEquals("test-case.properties", TestCase.getPropertiesFilename());
+        assertEquals("test-case.properties", TestCase.PROPERTIES_FILE_NAME);
     }
 
     @Test
     void testPropertyLoad() throws IOException {
-        final Properties props = TestCase.loadProperties();
+        final Properties props = ClasspathPropLoader.loadProperties(TestCase.PROPERTIES_FILE_NAME);
         assertEquals("ÄÖÜäöüß", props.getProperty(TestCase.UMLAUTS));
         assertEquals("Key 1", props.getProperty(TestCase.KEY_1));
         assertEquals("Key 2", props.getProperty(TestCase.KEY_2));
