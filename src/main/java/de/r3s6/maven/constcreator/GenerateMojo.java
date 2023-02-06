@@ -272,8 +272,7 @@ public class GenerateMojo extends AbstractMojo {
                 } catch (NoSuchFileException e) {
                     // IGNORED: file was already gone -- fine
                 } catch (IOException e) {
-                    addError(gr.getJavaFile(), 0, 0,
-                            "Could not delete: " + gr.getJavaFile() + " (" + e + ")", e);
+                    addError(gr.getJavaFile(), 0, 0, "Could not delete: " + gr.getJavaFile() + " (" + e + ")", e);
                 }
             }
         }
@@ -285,21 +284,16 @@ public class GenerateMojo extends AbstractMojo {
 
         buildContext.removeMessages(propFile);
 
-        final List<PropEntry> entries = new ArrayList<>();
+        final Properties props = new OrderedProperties();
         try (InputStream is = new FileInputStream(propFile)) {
-            final Properties props = new OrderedProperties();
             if (genReq.isXmlProperties()) {
                 props.loadFromXML(is);
             } else {
                 props.load(is);
             }
-            props.keySet().stream().forEach(k -> entries.add(new PropEntry((String) k, props.getProperty((String) k))));
-
         } catch (final IOException e) {
             addError(propFile, 0, 0, "Error loading properties file: " + e.getMessage(), e);
             return;
-        } catch (final IllegalArgumentException e) {
-            addError(propFile, 0, 0, "Properties file " + propFile + " contains invalid key: " + e.getMessage(), e);
         }
 
         final File javaFile = genReq.getJavaFile();
@@ -307,32 +301,49 @@ public class GenerateMojo extends AbstractMojo {
         javaFile.getParentFile().mkdirs();
 
         try {
-            createStringConstants(genReq, entries, javaFile);
+            createStringConstants(genReq, props);
         } catch (TemplateNotFoundException e) {
             throw new MojoExecutionException("Code template not found: " + e.getTemplateName(), e);
         } catch (final ParseException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        } catch (final IOException e) {
-            addError(genReq.getPropertiesFile(), 0, 0,
-                    "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
         } catch (TemplateException e) {
             final String tmplName = e.getEnvironment().getMainTemplate().getName();
             throw new MojoExecutionException("Error in template processing: " + tmplName + " (" + e.getMessage() + ")",
                     e);
+        } catch (final IOException e) {
+            addError(genReq.getPropertiesFile(), 0, 0,
+                    "Error generating Java file " + genReq.getJavaFileName() + " (" + e.toString() + ")", e);
+        } catch (final InvalidPropertyKeyException e) {
+            addError(propFile, 0, 0, "Properties file " + propFile + " contains invalid key: " + e.getMessage(), e);
         }
     }
 
-    private void createStringConstants(final GeneratorRequest genRequest, final List<PropEntry> entries,
-            final File javaFile) throws IOException, TemplateException {
+    /**
+     * Creates the java constants file.
+     *
+     * @param genRequest {@link GeneratorRequest}
+     * @param props      loaded properties
+     * @throws ParseException              invalid template, thrown by Freemarker
+     * @throws TemplateException           runtime problem in template processing,
+     *                                     thrown by Freemarker
+     * @throws TemplateNotFoundException   thrown by Freemarker
+     * @throws IOException                 template loading or writing the Java file
+     *                                     failed
+     * @throws InvalidPropertyKeyException the properties contain a key that can't
+     *                                     be translated to a Java variable/constant
+     *                                     name
+     */
+    private void createStringConstants(final GeneratorRequest genRequest, final Properties props)
+            throws IOException, TemplateException {
 
-        final Map<String, Object> model = buildModel(genRequest, entries);
+        final Map<String, Object> model = buildModel(genRequest, props);
 
         final String templateFile;
 
         switch (this.template) {
         case KEYS_TEMPLATE_ID:
         case VALUES_TEMPLATE_ID:
-            templateFile =  String.format(KEY_TEMPLATE_FMT, this.template);
+            templateFile = String.format(KEY_TEMPLATE_FMT, this.template);
             break;
 
         default:
@@ -340,17 +351,19 @@ public class GenerateMojo extends AbstractMojo {
             break;
         }
 
-        // CSOFF: MultipleString
         try (PrintWriter pw = new PrintWriter(
-                new OutputStreamWriter(buildContext.newFileOutputStream(javaFile), sourceEncoding))) {
+                new OutputStreamWriter(buildContext.newFileOutputStream(genRequest.getJavaFile()), sourceEncoding))) {
 
             tmplHandler.process(templateFile, model, pw);
 
         }
-        // CSON: MultipleString
     }
 
-    private Map<String, Object> buildModel(final GeneratorRequest genReq, final List<PropEntry> entries) {
+    private Map<String, Object> buildModel(final GeneratorRequest genReq, final Properties props) {
+
+        final List<PropEntry> entryList = props.keySet().stream()
+                .map(k -> new PropEntry((String) k, props.getProperty((String) k))).collect(Collectors.toList());
+
         final Map<String, Object> model = new HashMap<>();
 
         model.put("pkgName", genReq.getPkgName());
@@ -361,7 +374,8 @@ public class GenerateMojo extends AbstractMojo {
         model.put("bundleName", genReq.getBundleName());
         model.put("isXmlProperties", genReq.isXmlProperties());
 
-        model.put("entries", entries);
+        model.put("entries", entryList);
+        model.put("properties", props);
 
         model.put("options", templateOptions);
 
@@ -374,7 +388,6 @@ public class GenerateMojo extends AbstractMojo {
 
     private void addError(final File file, final int line, final int column, final String message,
             final Throwable thr) {
-
         buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, thr);
         errorMessages.add(String.format("%s[%d:%d] %s", file.getPath(), line, column, message));
     }

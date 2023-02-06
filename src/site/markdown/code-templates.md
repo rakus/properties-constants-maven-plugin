@@ -102,8 +102,16 @@ The model used for Freemarker templates contain the following fields:
 * `bundleName`: Like `propertiesFileName` but without extension and locale
   marker.
 * `isXmlProperties`: Whether the properties file is a XML file.
+* `properties`: Properties read from the properties file.
 * `entries`: List of entries to create constants. See below.
 * `options`: Map of template options. See below.
+
+### Properties
+
+The field `properties` contains the Properties as they were loaded from the properties file.
+This data is not used by the default templates, but may be useful in custom templates.
+
+Note: To access properties that have dot in the name use `${properties["key.with.dots"]}`.
 
 #### Entries
 

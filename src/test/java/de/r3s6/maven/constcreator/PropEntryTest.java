@@ -110,14 +110,15 @@ class PropEntryTest {
 
     @Test
     void testEmptyKeyException() {
-       IllegalArgumentException thr =  assertThrows(IllegalArgumentException.class, () -> new PropEntry("", "one"));
+        InvalidPropertyKeyException thr = assertThrows(InvalidPropertyKeyException.class,
+                () -> new PropEntry("", "one"));
 
-       assertEquals("empty key", thr.getMessage());
+        assertEquals("empty key", thr.getMessage());
     }
 
     @Test
     void testNullKeyException() {
-       NullPointerException thr =  assertThrows(NullPointerException.class, () -> new PropEntry(null, "one"));
-       assertEquals("PropEntry.key must not be null", thr.getMessage());
+        NullPointerException thr = assertThrows(NullPointerException.class, () -> new PropEntry(null, "one"));
+        assertEquals("PropEntry.key must not be null", thr.getMessage());
     }
 }
