@@ -44,14 +44,16 @@ public class PropEntry {
      *
      * @param key   the key from the properties file entry. Must not be empty.
      * @param value the value from a property file entry
-     * @throws NullPointerException     when key is null
-     * @throws IllegalArgumentException when key is invalid (e.g. empty)
+     * @throws NullPointerException        when key is null
+     * @throws InvalidPropertyKeyException when key can't be transformed to a Java
+     *                                     variable/constant name. Currently only
+     *                                     thrown for empty keys
      */
     public PropEntry(final String key, final String value) {
         Objects.requireNonNull(key, "PropEntry.key must not be null");
         this.key = key.trim();
         if (this.key.length() == 0) {
-            throw new IllegalArgumentException("empty key");
+            throw new InvalidPropertyKeyException("empty key");
         }
         this.value = value;
 
