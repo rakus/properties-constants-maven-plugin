@@ -1,4 +1,4 @@
-package de.r3s6.maven.constcreator;
+package de.r3s6.maven.constcreator.inttest;
 /*
  *
  * Copyright 2023 Ralf Schandl
