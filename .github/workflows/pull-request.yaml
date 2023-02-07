@@ -77,7 +77,7 @@ jobs:
         uses: madrapps/jacoco-report@v1.3
         with:
           title: "Unit & Integration Test Coverage"
-          paths: ${{ github.workspace }}/target/jacoco-it/jacoco.xml
+          paths: ${{ github.workspace }}/target/jacoco-html/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80
           min-coverage-changed-files: 80
