@@ -15,9 +15,9 @@ package de.r3s6.maven.constcreator;
  * limitations under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+
+import de.r3s6.maven.constcreator.NameHandler.JavaNames;
 
 /**
  * PropEntry describes a property file entry with generated Java names.
@@ -28,9 +28,6 @@ import java.util.Objects;
  * @author Ralf Schandl
  */
 public class PropEntry {
-
-    private static final String DIV = "_";
-    private static final char DIV_CHR = DIV.charAt(0);
 
     private final String key;
     private final String value;
@@ -57,11 +54,10 @@ public class PropEntry {
         }
         this.value = value;
 
-        final List<String> parts = splitParts(key);
-
-        constantName = buildConstantName(parts);
-        variableName = buildVariableName(parts);
-        getterName = buildGetterName(parts);
+        final JavaNames names = NameHandler.createJavaNames(key);
+        constantName = names.getConstantName();
+        variableName = names.getVariableName();
+        getterName =   names.getGetterName();
     }
 
     public String getConstantName() {
@@ -83,77 +79,4 @@ public class PropEntry {
     public String getValue() {
         return value;
     }
-
-    private List<String> splitParts(final String propKey) {
-        final List<String> parts = new ArrayList<>();
-
-        final StringBuilder sb = new StringBuilder();
-
-        boolean lastIsLower = false;
-
-        for (char chr : propKey.toCharArray()) {
-
-            final boolean isUpper = Character.isUpperCase(chr);
-
-            if (chr != DIV_CHR && Character.isJavaIdentifierPart(chr)) {
-                if (lastIsLower && isUpper) {
-                    parts.add(sb.toString());
-                    sb.setLength(0);
-                }
-                sb.append(chr);
-                lastIsLower = !isUpper;
-            } else if (sb.length() > 0) {
-                parts.add(sb.toString());
-                sb.setLength(0);
-                lastIsLower = false;
-            }
-        }
-
-        if (sb.length() > 0) {
-            parts.add(sb.toString());
-        }
-
-        return parts;
-
-    }
-
-    private String buildConstantName(final List<String> parts) {
-        final String name = String.join(DIV, parts).toUpperCase();
-        if (Character.isJavaIdentifierStart(name.charAt(0))) {
-            return name;
-        } else {
-            return DIV + name;
-        }
-
-    }
-
-    private String buildVariableName(final List<String> parts) {
-
-        final StringBuilder sb = new StringBuilder();
-
-        for (String part : parts) {
-            sb.append(Character.toUpperCase(part.charAt(0)));
-            sb.append(part.substring(1).toLowerCase());
-        }
-
-        if (Character.isJavaIdentifierStart(sb.charAt(0))) {
-            sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
-        } else {
-            sb.insert(0, DIV);
-        }
-
-        return sb.toString();
-    }
-
-    private String buildGetterName(final List<String> parts) {
-        final StringBuilder sb = new StringBuilder("get");
-
-        for (String part : parts) {
-            sb.append(Character.toUpperCase(part.charAt(0)));
-            sb.append(part.substring(1).toLowerCase());
-        }
-
-        return sb.toString();
-    }
-
 }

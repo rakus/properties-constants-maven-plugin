@@ -471,6 +471,231 @@ class GenerateMojoTest {
         mavenLog.assertContainsSubString("[info] Skipped - skip == true");
     }
 
+    @Test
+    void testBuildGeneratorRequest() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        GeneratorRequest gr = mojo.buildGeneratorRequest("test.properties");
+        assertEquals("test.properties", gr.getPropertiesFileName());
+        assertEquals("test", gr.getBundleName());
+        assertEquals("pkg.Test", gr.getFullClassName());
+        assertEquals("pkg", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+
+        gr = mojo.buildGeneratorRequest("test-case.properties");
+        assertEquals("test-case.properties", gr.getPropertiesFileName());
+        // test-case is not a valid bundle name, we set it anyways
+        assertEquals("test-case", gr.getBundleName());
+        assertEquals("pkg.TestCase", gr.getFullClassName());
+        assertEquals("pkg", gr.getPackageName());
+        assertEquals("TestCase", gr.getSimpleClassName());
+        assertEquals("pkg/TestCase.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test-case.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/TestCase.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestNoExt() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        final GeneratorRequest gr = mojo.buildGeneratorRequest("test-case");
+        assertEquals("test-case", gr.getPropertiesFileName());
+        // test-case is not a valid bundle name, we set it anyways
+        assertEquals("test-case", gr.getBundleName());
+        assertEquals("pkg.TestCase", gr.getFullClassName());
+        assertEquals("pkg", gr.getPackageName());
+        assertEquals("TestCase", gr.getSimpleClassName());
+        assertEquals("pkg/TestCase.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test-case"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/TestCase.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestSubDir() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        GeneratorRequest gr = mojo.buildGeneratorRequest("test/test.properties");
+        assertEquals("test/test.properties", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.test.Test", gr.getFullClassName());
+        assertEquals("pkg.test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+
+        gr = mojo.buildGeneratorRequest("test-case/test.properties");
+        assertEquals("test-case/test.properties", gr.getPropertiesFileName());
+        assertEquals("test-case.test", gr.getBundleName());
+        assertEquals("pkg.testcase.Test", gr.getFullClassName());
+        assertEquals("pkg.testcase", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/testcase/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test-case/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/testcase/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestSubDirWeirdChars() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        GeneratorRequest gr = mojo.buildGeneratorRequest("0test/test.properties");
+        assertEquals("0test/test.properties", gr.getPropertiesFileName());
+        assertEquals("0test.test", gr.getBundleName());
+        assertEquals("pkg._0test.Test", gr.getFullClassName());
+        assertEquals("pkg._0test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/_0test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/0test/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/_0test/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+
+        gr = mojo.buildGeneratorRequest("%test/test.properties");
+        assertEquals("%test/test.properties", gr.getPropertiesFileName());
+        assertEquals("%test.test", gr.getBundleName());
+        assertEquals("pkg._test.Test", gr.getFullClassName());
+        assertEquals("pkg._test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/_test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/%test/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/_test/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+
+    @Test
+    void testBuildGeneratorRequestFlatten() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+        inject(mojo, "flattenPackage", true);
+
+        final GeneratorRequest gr = mojo.buildGeneratorRequest("test/test.properties");
+        assertEquals("test/test.properties", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.Test", gr.getFullClassName());
+        assertEquals("pkg", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestSuffix() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+        inject(mojo, "flattenPackage", true);
+        inject(mojo, "classNameSuffix", "Suffix");
+
+        final GeneratorRequest gr = mojo.buildGeneratorRequest("test/test.properties");
+        assertEquals("test/test.properties", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.TestSuffix", gr.getFullClassName());
+        assertEquals("pkg", gr.getPackageName());
+        assertEquals("TestSuffix", gr.getSimpleClassName());
+        assertEquals("pkg/TestSuffix.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/TestSuffix.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestLocale() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        GeneratorRequest gr = mojo.buildGeneratorRequest("test/test_en.properties");
+        assertEquals("test/test_en.properties", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.test.Test", gr.getFullClassName());
+        assertEquals("pkg.test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test_en.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+
+        gr = mojo.buildGeneratorRequest("test/test_en_US.properties");
+        assertEquals("test/test_en_US.properties", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.test.Test", gr.getFullClassName());
+        assertEquals("pkg.test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test_en_US.properties"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
+        assertFalse(gr.isXmlProperties());
+    }
+
+    @Test
+    void testBuildGeneratorRequestXml() throws MojoExecutionException, MojoFailureException {
+        GenerateMojo mojo = createMojo("pkg");
+
+        inject(mojo, "outputDir", new File("output-dir"));
+        inject(mojo, "resourceDir", new File("input-dir"));
+
+        GeneratorRequest gr = mojo.buildGeneratorRequest("test/test.xml");
+        assertEquals("test/test.xml", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.test.Test", gr.getFullClassName());
+        assertEquals("pkg.test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test.xml"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
+        assertTrue(gr.isXmlProperties());
+
+        gr = mojo.buildGeneratorRequest("test/test.xml-props");
+        assertEquals("test/test.xml-props", gr.getPropertiesFileName());
+        assertEquals("test.test", gr.getBundleName());
+        assertEquals("pkg.test.Test", gr.getFullClassName());
+        assertEquals("pkg.test", gr.getPackageName());
+        assertEquals("Test", gr.getSimpleClassName());
+        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
+        assertEquals(new File("input-dir/test/test.xml-props"), gr.getPropertiesFile());
+        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
+        assertTrue(gr.isXmlProperties());
+    }
+
+    @Test
+    void testRemoveResourceBundleLocale()
+    {
+        GenerateMojo mojo = createMojo("pkg");
+
+        assertEquals("test", mojo.removeResourceBundleLocale("test_de"));
+        assertEquals("test", mojo.removeResourceBundleLocale("test_de_DE"));
+        assertEquals("test", mojo.removeResourceBundleLocale("test_de_DE_Unix"));
+        assertEquals("test", mojo.removeResourceBundleLocale("test_de_Latn_DE"));
+        assertEquals("test", mojo.removeResourceBundleLocale("test_de_Latn_DE_Unix"));
+    }
+
     /**
      * Create GenerateMojo with basePackage and some base config.
      *

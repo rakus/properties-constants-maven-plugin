@@ -16,9 +16,7 @@ package de.r3s6.maven.constcreator;
  */
 
 import java.io.File;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ResourceBundle;
 
 /**
  * Holds information about the requested code generation.
@@ -32,14 +30,11 @@ import java.util.regex.Pattern;
 // CSOFF: MultipleString
 public final class GeneratorRequest {
 
-    /** Pattern to match invalid variable name chars. */
-    private static final Pattern INVALID_NAME_CHARS = Pattern.compile("[^A-Za-z0-9_]");
-
     /** Package name. */
-    private final String pkgName;
+    private final String packageName;
 
     /** Simple class name (without package). */
-    private final String className;
+    private final String simpleClassName;
 
     /** Class name with package. */
     private final String fullClassName;
@@ -51,7 +46,7 @@ public final class GeneratorRequest {
     private final File javaFile;
 
     /** File name of the property (relative to search dir). */
-    private final String propertyFileName;
+    private final String propertiesFileName;
 
     /** The properties file. */
     private final File propertiesFile;
@@ -66,63 +61,20 @@ public final class GeneratorRequest {
     private final String bundleName;
 
     // CSOFF: ParameterNumberCheck
-    GeneratorRequest(final File resourceDir, final File outputDir, final String pkgName, final String propFileName,
-            final boolean flatten, final String classNameAppendix) {
-        Objects.requireNonNull(resourceDir);
-        Objects.requireNonNull(outputDir);
-        Objects.requireNonNull(pkgName);
-        Objects.requireNonNull(propFileName);
-        Objects.requireNonNull(classNameAppendix);
+    private GeneratorRequest(final String fullClassName, final String javaFileName, final File javaFile,
+            final String propertiesFileName, final File propertiesFile, final boolean xmlProperties,
+            final String bundleName) {
+        this.fullClassName = fullClassName;
+        this.javaFileName = javaFileName;
+        this.javaFile = javaFile;
+        this.propertiesFileName = propertiesFileName;
+        this.propertiesFile = propertiesFile;
+        this.xmlProperties = xmlProperties;
+        this.bundleName = bundleName;
 
-        if (pkgName.trim().length() == 0) {
-            throw new IllegalArgumentException("Empty package name not supported");
-        }
-
-        final String portableFileName = propFileName.replace('\\', '/');
-
-        this.propertyFileName = portableFileName;
-
-        this.xmlProperties = portableFileName.toLowerCase().endsWith(".xml");
-
-        // remove extension and locale stuff
-        this.bundleName = portableFileName.replaceAll("\\.[^.]*$", "").replaceAll("_[a-z][a-z](_[A-Z][A-Z])?$", "");
-
-        // concat and replace file separators
-        final String fqName;
-        if (flatten) {
-            fqName = (pkgName + "." + bundleName.replaceFirst("^.*[\\\\/]", "")).replaceAll("[\\\\/]", ".");
-        } else {
-            fqName = (pkgName + "." + bundleName).replaceAll("[\\\\/]", ".");
-        }
-
-        final int lastDotIdx = fqName.lastIndexOf('.');
-        String pName = fqName.substring(0, lastDotIdx);
-        String cName = fqName.substring(lastDotIdx + 1);
-
-        // clean package name
-        pName = pName.replace("-", "");
-
-        // clean class name
-        final StringBuffer sb = new StringBuffer();
-        final Matcher m = Pattern.compile("[-_.](.)").matcher(cName);
-        while (m.find()) {
-            m.appendReplacement(sb, m.group(1).toUpperCase());
-        }
-        m.appendTail(sb);
-
-        cName = INVALID_NAME_CHARS.matcher(sb.toString()).replaceAll("");
-        cName = cName.substring(0, 1).toUpperCase() + cName.substring(1);
-        cName = cName + classNameAppendix;
-
-        this.pkgName = pName;
-        this.className = cName;
-        this.fullClassName = pName + "." + cName;
-
-        this.javaFileName = this.fullClassName.replace('.', '/') + ".java";
-
-        this.propertiesFile = new File(resourceDir, this.propertyFileName);
-        this.javaFile = new File(outputDir, getJavaFileName());
-
+        final int lastDot = fullClassName.lastIndexOf('.');
+        this.packageName = fullClassName.substring(0, lastDot);
+        this.simpleClassName = fullClassName.substring(lastDot + 1);
     }
     // CSON: ParameterNumberCheck
 
@@ -143,12 +95,12 @@ public final class GeneratorRequest {
         return 17 * fullClassName.hashCode();
     }
 
-    public String getPkgName() {
-        return pkgName;
+    public String getPackageName() {
+        return packageName;
     }
 
     public String getSimpleClassName() {
-        return className;
+        return simpleClassName;
     }
 
     public String getFullClassName() {
@@ -164,7 +116,7 @@ public final class GeneratorRequest {
     }
 
     public String getPropertiesFileName() {
-        return propertyFileName;
+        return propertiesFileName;
     }
 
     public File getPropertiesFile() {
@@ -174,10 +126,10 @@ public final class GeneratorRequest {
     /**
      * The resource bundle name.
      * <p>
-     * This is the file name of the properties file with extension and locale
-     * marker (e.g "_en") removed.
+     * This is the file name of the properties file with extension and locale marker
+     * (e.g "_en") removed and slashes replaced by dots.
      * <p>
-     * E.g. {@code dir/messages_en_US.properties} becomes {@code dir/messages}.
+     * E.g. {@code dir/messages_en_US.properties} becomes {@code dir.messages}.
      *
      * @return the bundle name
      */
@@ -188,4 +140,124 @@ public final class GeneratorRequest {
     public boolean isXmlProperties() {
         return xmlProperties;
     }
+
+    /**
+     * Builder for a {@link GeneratorRequest}.
+     */
+    public static class Builder {
+
+        /** Class name with package. */
+        private String fullClassName;
+
+        /** The java output file name, relative to the output directory. */
+        private String javaFileName;
+
+        /** the java output file. */
+        private File javaFile;
+
+        /** File name of the property (relative to search dir). */
+        private String propertiesFileName;
+
+        /** The properties file. */
+        private File propertiesFile;
+
+        /** Whether the properties file is a xml file. */
+        private boolean xmlProperties;
+
+        /**
+         * Bundle name is file name with extension and language marker (e.g "_en")
+         * removed.
+         */
+        private String bundleName;
+
+        /**
+         * Builds a {@link GeneratorRequest} from the builder content.
+         *
+         * @return a fresh GeneratorRequest
+         */
+        public GeneratorRequest build() {
+            return new GeneratorRequest(fullClassName, javaFileName, javaFile, propertiesFileName, propertiesFile,
+                    xmlProperties, bundleName);
+        }
+
+        /**
+         * Sets the name of the class to create.
+         *
+         * @param className the fully qualified class name
+         * @return this Builder
+         */
+        public Builder className(final String className) {
+            this.fullClassName = className;
+            return this;
+        }
+
+        /**
+         * Sets the java file name to create.
+         *
+         * @param theJavaFileName the java file name relative to output directory.
+         * @return this Builder
+         */
+        public Builder javaFileName(final String theJavaFileName) {
+            this.javaFileName = theJavaFileName;
+            return this;
+        }
+
+        /**
+         * Sets the java file (including output directory).
+         *
+         * @param theJavaFile the java file
+         * @return this Builder
+         */
+        public Builder javaFile(final File theJavaFile) {
+            this.javaFile = theJavaFile;
+            return this;
+        }
+
+        /**
+         * Sets the properties file name.
+         *
+         * @param thePropertiesFileName the property file name relative to resource directory
+         * @return this Builder
+         */
+        public Builder propertiesFileName(final String thePropertiesFileName) {
+            this.propertiesFileName = thePropertiesFileName;
+            return this;
+        }
+
+        /**
+         * Sets the properties file (including resource directory).
+         *
+         * @param thePropertiesFile the properties file.
+         * @return this Builder
+         */
+        public Builder propertiesFile(final File thePropertiesFile) {
+            this.propertiesFile = thePropertiesFile;
+            return this;
+        }
+
+        /**
+         * Sets whether the properties file is a xml file, according to the file
+         * extension.
+         *
+         * @param isXmlProperties whether the properties is a xml file
+         * @return this Builder
+         */
+        public Builder xmlProperties(final boolean isXmlProperties) {
+            this.xmlProperties = isXmlProperties;
+            return this;
+        }
+
+        /**
+         * Sets the name of the resource bundle. Suitable to load the properties file
+         * via {@link ResourceBundle}.
+         *
+         * @param theBundleName the resource bundle name
+         * @return this Builder
+         */
+        public Builder bundleName(final String theBundleName) {
+            this.bundleName = theBundleName;
+            return this;
+        }
+    }
+
 }

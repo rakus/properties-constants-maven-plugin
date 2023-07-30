@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## unreleased
+
+**This release contains breaking changes.**
+
+## Fixed
+
+* bundle name now uses dots as separator instead of slashes
+
+### Changed
+
+* **BREAKING**: Custom Freemarker template must be either on the classpath  or
+  relative to project root. Absolute file names are no longer supported.
+
 ## [0.4.0] - 2023-02-10
 
 **This release contains breaking changes.**

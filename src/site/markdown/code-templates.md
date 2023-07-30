@@ -45,6 +45,11 @@ markers. The name of the constant can be changed with the option
 Typically `genPropertiesFilenameConstant` is set to `false` when
 `genBundleNameConstant` is `true`.
 
+**NOTE**: According to the JavaDoc of `java.util.ResourceBundle`, the bundle name
+should be a valid class name. The plugin does not validate the generated bundle
+name, so it might be an invalid class name. On the other hand, `ResourceBundle`
+seems be able to load resource bundles from files that are not valid class names.
+
 #### `bundleNameConstant`
 String, Default: `BUNDLE_NAME`
 
@@ -100,7 +105,7 @@ The model used for Freemarker templates contain the following fields:
 * `propertiesFileName`: name of the properties file relative to the
   `<resourceDir>`
 * `bundleName`: Like `propertiesFileName` but without extension and locale
-  marker.
+  marker and dots instead of slashes as separator.
 * `isXmlProperties`: Whether the properties file is a XML file.
 * `properties`: Properties read from the properties file.
 * `entries`: List of entries to create constants. See below.
