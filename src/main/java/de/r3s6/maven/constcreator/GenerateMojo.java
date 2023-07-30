@@ -140,7 +140,12 @@ public class GenerateMojo extends AbstractMojo {
      * <p>
      * The plugin provides the templates <code>keys</code> and <code>values</code>.
      * <p>
-     * A file name can be given for a custom Freemarker template.
+     * A file name can be given for a custom Freemarker template. File name lookup
+     * is:
+     * <ol>
+     * <li>classpath</li>
+     * <li>relative to project basedir</li>
+     * </ol>
      */
     @Parameter(defaultValue = DEFAULT_TEMPLATE_ID)
     private String template = DEFAULT_TEMPLATE_ID;

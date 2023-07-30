@@ -48,21 +48,18 @@ public class TemplateHandler {
         configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         configuration.setIncompatibleImprovements(FREEMARKER_VERSION);
 
-        final ClassTemplateLoader classTl = new ClassTemplateLoader(getClass(), "/");
-        final FileTemplateLoader projectTl;
-        final FileTemplateLoader absolutTl;
+        final ClassTemplateLoader classpathTemplateLoader = new ClassTemplateLoader(getClass(), "/");
+        final FileTemplateLoader projectTemplateLoader;
         try {
-            projectTl = new FileTemplateLoader(projectBasedir);
-            absolutTl = new FileTemplateLoader(new File("/"));
+            projectTemplateLoader = new FileTemplateLoader(projectBasedir);
         } catch (IOException e) {
-            // should not be reached. The project basedir and the root dir should always
-            // exist.
+            // should not be reached. The project basedir should always exist.
             throw new IllegalStateException(e.getMessage(), e);
         }
 
-        final MultiTemplateLoader multiTl = new MultiTemplateLoader(
-                new TemplateLoader[] { classTl, projectTl, absolutTl });
-        configuration.setTemplateLoader(multiTl);
+        final MultiTemplateLoader multiTemplateLoader = new MultiTemplateLoader(
+                new TemplateLoader[] { classpathTemplateLoader, projectTemplateLoader });
+        configuration.setTemplateLoader(multiTemplateLoader);
     }
 
     /**
