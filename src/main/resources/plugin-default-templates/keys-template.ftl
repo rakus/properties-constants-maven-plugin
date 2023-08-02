@@ -18,7 +18,7 @@
 <#assign propertiesFilenameConstant    = options.propertiesFilenameConstant!"PROPERTIES_FILE_NAME">
 <#assign genBundleNameConstant         = ((options.genBundleNameConstant!"false") == "true")>
 <#assign bundleNameConstant            = options.bundleNameConstant!"BUNDLE_NAME">
-package ${pkgName};
+package ${packageName};
 
 /**
  * Constants for ${propertiesFileName}
@@ -32,9 +32,6 @@ public final class ${simpleClassName} {
 
     /**
      * Properties file used to generate this class: "${propertiesFileName}".
-     * <p>
-     * If this name should be used to load the properties via classpath,
-     * a leading slash ('/') might be needed.
      */
     public final static String ${propertiesFilenameConstant} = "${propertiesFileName}";
 </#if>

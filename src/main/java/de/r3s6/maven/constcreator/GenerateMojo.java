@@ -300,6 +300,8 @@ public class GenerateMojo extends AbstractMojo {
 
     private void createConstants(final GeneratorRequest genReq) throws MojoExecutionException {
 
+        getLog().debug("Creating " + genReq.getFullClassName() + " from " + genReq.getPropertiesFileName());
+
         final File propFile = genReq.getPropertiesFile();
 
         buildContext.removeMessages(propFile);
@@ -373,9 +375,7 @@ public class GenerateMojo extends AbstractMojo {
 
         try (PrintWriter pw = new PrintWriter(
                 new OutputStreamWriter(buildContext.newFileOutputStream(genRequest.getJavaFile()), sourceEncoding))) {
-
             tmplHandler.process(templateFile, model, pw);
-
         }
     }
 
@@ -386,7 +386,7 @@ public class GenerateMojo extends AbstractMojo {
 
         final Map<String, Object> model = new HashMap<>();
 
-        model.put("pkgName", genReq.getPackageName());
+        model.put("packageName", genReq.getPackageName());
         model.put("simpleClassName", genReq.getSimpleClassName());
         model.put("fullClassName", genReq.getFullClassName());
         model.put("propertiesFileName", genReq.getPropertiesFileName());

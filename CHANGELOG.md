@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * **BREAKING**: Custom Freemarker template must be either on the classpath  or
   relative to project root. Absolute file names are no longer supported.
+* **BREAKING** for custom Freemarker templates: The package name variable in
+  the template model was renamed from `pkgName` to `packageName`.
 
 ## [0.4.0] - 2023-02-10
 

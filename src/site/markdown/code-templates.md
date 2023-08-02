@@ -97,7 +97,7 @@ start with a ftl directive defining the character encoding. Like:
 
 The model used for Freemarker templates contain the following fields:
 
-* `pkgName`: the java package name of the generated class
+* `packageName`: the java package name of the generated class
 * `simpleClassName`: The name of the generated class without package
 * `fullClassName`: the fully qualified class name including package
 * `javaFileName`: Name of the generated Java file including the directories
