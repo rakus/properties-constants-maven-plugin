@@ -28,7 +28,7 @@ public final class ${simpleClassName} {
     /**
      * Value of ${entry.key}=${entry.value}
      */
-    public final static String ${entry.unknownField} = "${entry.value?j_string}";
+    public static final String ${entry.unknownField} = "${entry.value?j_string}";
 
 </#list>
 

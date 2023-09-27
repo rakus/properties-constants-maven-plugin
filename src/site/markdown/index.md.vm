@@ -43,17 +43,17 @@ public final class Messages {
     /**
      * Properties file used to generate this class: "messages.properties".
      */
-    public final static String PROPERTIES_FILE_NAME = "messages.properties";
+    public static final String PROPERTIES_FILE_NAME = "messages.properties";
 
     /**
      * Key of welcome=Welcome to Maven
      */
-    public final static String WELCOME = "welcome";
+    public static final String WELCOME = "welcome";
 
     /**
      * Key of goodby=See you next time
      */
-    public final static String GOODBY = "goodby";
+    public static final String GOODBY = "goodby";
 
     /** Hidden constructor. */
     private Messages() {
@@ -76,12 +76,12 @@ public final class Messages {
     /**
      * Value of welcome=Welcome to Maven
      */
-    public final static String WELCOME = "Welcome to Maven";
+    public static final String WELCOME = "Welcome to Maven";
 
     /**
      * Value of goodby=See you next time
      */
-    public final static String GOODBY = "See you next time";
+    public static final String GOODBY = "See you next time";
 
     /** Hidden constructor. */
     private Messages() {

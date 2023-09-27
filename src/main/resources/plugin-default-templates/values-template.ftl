@@ -29,7 +29,7 @@ public final class ${simpleClassName} {
     /**
      * Value of ${entry.key}=${entry.value}
      */
-    public final static String ${entry.constantName} = "${entry.value?j_string}";
+    public static final String ${entry.constantName} = "${entry.value?j_string}";
 </#list>
 
     /** Hidden constructor. */

@@ -289,7 +289,7 @@
             <property name="allowMarkerInterfaces" value="true" />
         </module>
 
-        <!-- Only final static members might be public, all others must be
+        <!-- Only static final members might be public, all others must be
             private or protected. -->
         <module name="VisibilityModifier" />
 

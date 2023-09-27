@@ -33,21 +33,21 @@ public final class ${simpleClassName} {
     /**
      * Properties file used to generate this class: "${propertiesFileName}".
      */
-    public final static String ${propertiesFilenameConstant} = "${propertiesFileName}";
+    public static final String ${propertiesFilenameConstant} = "${propertiesFileName}";
 </#if>
 <#if genBundleNameConstant>
 
     /**
      * ResourceBundle used to generate this class: "${bundleName}"
      */
-    public final static String ${bundleNameConstant} = "${bundleName}";
+    public static final String ${bundleNameConstant} = "${bundleName}";
 </#if>
 <#list entries as entry>
 
     /**
      * Key of ${entry.key}=${entry.value}
      */
-    public final static String ${entry.constantName} = "${entry.key}";
+    public static final String ${entry.constantName} = "${entry.key}";
 </#list>
 
     /** Hidden constructor. */
