@@ -23,13 +23,17 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.lang.model.SourceVersion;
@@ -63,6 +67,19 @@ public class GenerateMojo extends AbstractMojo {
     private static final String DEFAULT_TEMPLATE_ID = KEYS_TEMPLATE_ID;
 
     private static final String KEY_TEMPLATE_FMT = "plugin-default-templates/%s-template.ftl";
+
+    /**
+     * Match locale marker of resource bundle properties files.
+     * <ul>
+     * <li>_de
+     * <li>_de_DE
+     * <li>_de_DE_Windows
+     * <li>_de_Latn_DE
+     * <li>_de_Latn_DE_Windows
+     * </ul>
+     */
+    private static final Pattern RESOURCE_BUNDLE_LOCALE_PATTERN = Pattern
+            .compile("_[a-z]{2}((_[A-z]{4})?_[A-Z]{2}(_\\w+)?)?$");
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -140,7 +157,12 @@ public class GenerateMojo extends AbstractMojo {
      * <p>
      * The plugin provides the templates <code>keys</code> and <code>values</code>.
      * <p>
-     * A file name can be given for a custom Freemarker template.
+     * A file name can be given for a custom Freemarker template. File name lookup
+     * is:
+     * <ol>
+     * <li>classpath</li>
+     * <li>relative to project basedir</li>
+     * </ol>
      */
     @Parameter(defaultValue = DEFAULT_TEMPLATE_ID)
     private String template = DEFAULT_TEMPLATE_ID;
@@ -151,7 +173,7 @@ public class GenerateMojo extends AbstractMojo {
      * The template <code>keys</code> supports the following options:
      * <dl>
      * <dt>genPropertiesFilenameConstant</dt>
-     * <dd>generate the constant <code>PROPERTIES_FILE_NAME()</code></dd>
+     * <dd>generate the constant <code>PROPERTIES_FILE_NAME</code></dd>
      * <dt>propertiesFilenameConstant</dt>
      * <dd>changes the name of the properties file name constant</dd>
      * <dt>genBundleNameConstant</dt>
@@ -241,8 +263,7 @@ public class GenerateMojo extends AbstractMojo {
 
         final Map<String, GeneratorRequest> genRequests = new LinkedHashMap<>();
         for (final String propFile : scanner.getIncludedFiles()) {
-            final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
-                    flattenPackage, classNameSuffix);
+            final GeneratorRequest gr = buildGeneratorRequest(propFile);
             if (!genRequests.containsKey(gr.getFullClassName())) {
                 genRequests.put(gr.getFullClassName(), gr);
             } else {
@@ -263,14 +284,13 @@ public class GenerateMojo extends AbstractMojo {
         scanner.scan();
 
         for (final String propFile : scanner.getIncludedFiles()) {
-            final GeneratorRequest gr = new GeneratorRequest(resourceDir, outputDir, basePackage, propFile,
-                    flattenPackage, classNameSuffix);
+            final GeneratorRequest gr = buildGeneratorRequest(propFile);
             if (gr.getJavaFile().exists()) {
                 try {
                     Files.delete(gr.getJavaFile().toPath());
                     buildContext.refresh(gr.getJavaFile());
                 } catch (NoSuchFileException e) {
-                    // IGNORED: file was already gone -- fine
+                    // IGNORED: file already gone -- fine
                 } catch (IOException e) {
                     addError(gr.getJavaFile(), 0, 0, "Could not delete: " + gr.getJavaFile() + " (" + e + ")", e);
                 }
@@ -279,6 +299,8 @@ public class GenerateMojo extends AbstractMojo {
     }
 
     private void createConstants(final GeneratorRequest genReq) throws MojoExecutionException {
+
+        getLog().debug("Creating " + genReq.getFullClassName() + " from " + genReq.getPropertiesFileName());
 
         final File propFile = genReq.getPropertiesFile();
 
@@ -305,7 +327,7 @@ public class GenerateMojo extends AbstractMojo {
         } catch (TemplateNotFoundException e) {
             throw new MojoExecutionException("Code template not found: " + e.getTemplateName(), e);
         } catch (final ParseException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
+            throw new MojoExecutionException("Error parsing template:" + e.getMessage(), e);
         } catch (TemplateException e) {
             final String tmplName = e.getEnvironment().getMainTemplate().getName();
             throw new MojoExecutionException("Error in template processing: " + tmplName + " (" + e.getMessage() + ")",
@@ -353,9 +375,7 @@ public class GenerateMojo extends AbstractMojo {
 
         try (PrintWriter pw = new PrintWriter(
                 new OutputStreamWriter(buildContext.newFileOutputStream(genRequest.getJavaFile()), sourceEncoding))) {
-
             tmplHandler.process(templateFile, model, pw);
-
         }
     }
 
@@ -366,7 +386,7 @@ public class GenerateMojo extends AbstractMojo {
 
         final Map<String, Object> model = new HashMap<>();
 
-        model.put("pkgName", genReq.getPkgName());
+        model.put("packageName", genReq.getPackageName());
         model.put("simpleClassName", genReq.getSimpleClassName());
         model.put("fullClassName", genReq.getFullClassName());
         model.put("propertiesFileName", genReq.getPropertiesFileName());
@@ -390,5 +410,106 @@ public class GenerateMojo extends AbstractMojo {
             final Throwable thr) {
         buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, thr);
         errorMessages.add(String.format("%s[%d:%d] %s", file.getPath(), line, column, message));
+    }
+
+    // package visibility for testing
+    GeneratorRequest buildGeneratorRequest(final String propertyFileName) {
+
+        final GeneratorRequest.Builder builder = new GeneratorRequest.Builder();
+
+        final String portableName = propertyFileName.replace('\\', '/');
+        builder.propertiesFileName(portableName);
+        builder.propertiesFile(new File(resourceDir, portableName));
+
+        // Is it XML?
+        final int lastDot = portableName.lastIndexOf('.');
+        if (lastDot >= 0) {
+            final String extension = portableName.substring(lastDot + 1);
+            builder.xmlProperties(extension.toLowerCase(Locale.US).contains("xml"));
+        }
+
+        final Path path = Paths.get(portableName);
+        final String basename = path.getFileName().toString();
+
+        final int cnt = path.getNameCount();
+        final List<String> nameParts = new ArrayList<>();
+        if (!flattenPackage) {
+            for (int x = 0; x < cnt - 1; x++) {
+                final String name = path.getName(x).toString();
+                if (SourceVersion.isName(name)) {
+                    nameParts.add(name);
+                } else {
+                    nameParts.add(createValidJavaName(name));
+                }
+            }
+        }
+
+        nameParts.add(baseNametoClassname(basename) + classNameSuffix);
+
+        // build java fully qualified class name
+        final String className = basePackage + "." + String.join(".", nameParts);
+        final String javaFilename = className.replace('.', '/') + ".java";
+
+        builder.className(className);
+        builder.javaFileName(javaFilename);
+        builder.javaFile(new File(outputDir, javaFilename));
+
+        nameParts.clear();
+        for (int x = 0; x < cnt - 1; x++) {
+            nameParts.add(path.getName(x).toString());
+        }
+        nameParts.add(baseNametoBundleName(basename));
+
+        final String bundleName = String.join(".", nameParts);
+        builder.bundleName(bundleName);
+
+        if (getLog().isDebugEnabled() && !SourceVersion.isName(bundleName)) {
+            getLog().debug("Bundle name is not a valid class name (might work anyways): " + bundleName);
+        }
+
+        return builder.build();
+    }
+
+    private String baseNametoClassname(final String basename) {
+        return NameHandler.createTypeName(baseNametoBundleName(basename));
+    }
+
+    private String baseNametoBundleName(final String basename) {
+        // remove extension
+        final int idx = basename.lastIndexOf('.');
+        final String name;
+        if (idx > 0) {
+            name = basename.substring(0, idx);
+        } else {
+            name = basename;
+        }
+        return removeResourceBundleLocale(name);
+    }
+
+    // package visibility for testing
+    String removeResourceBundleLocale(final String name) {
+        return RESOURCE_BUNDLE_LOCALE_PATTERN.matcher(name).replaceAll("");
+    }
+
+    private String createValidJavaName(final String name) {
+        final StringBuilder sb = new StringBuilder();
+        final char[] chrs = name.toCharArray();
+        if (Character.isJavaIdentifierStart(chrs[0])) {
+            sb.append(chrs[0]);
+        } else if (Character.isJavaIdentifierPart(chrs[0])) {
+            sb.append('_');
+            sb.append(chrs[0]);
+        } else {
+            sb.append('_');
+        }
+
+        for (int x = 1; x < chrs.length; x++) {
+            final char c = chrs[x];
+            if (Character.isJavaIdentifierPart(c)) {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
     }
 }

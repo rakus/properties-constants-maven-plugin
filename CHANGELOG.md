@@ -6,6 +6,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2023-02-10
+
+**This release contains breaking changes.**
+
+### Fixed
+
+* bundle name now uses dots as separator instead of slashes
+* key/values are now escaped when used in javadoc
+
+### Changed
+
+* **BREAKING**: Custom Freemarker template must be either on the classpath  or
+  relative to project root. Absolute file names are no longer supported.
+* **BREAKING** for custom Freemarker templates: The package name variable in
+  the template model was renamed from `pkgName` to `packageName`.
+
 ## [0.4.0] - 2023-02-10
 
 **This release contains breaking changes.**
@@ -66,6 +82,7 @@ Initial implementation.
 
 
 
+[0.5.0]: https://github.com/rakus/properties-constants-maven-plugin/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rakus/properties-constants-maven-plugin/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rakus/properties-constants-maven-plugin/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/rakus/properties-constants-maven-plugin/compare/v0.1.0...v0.2.0

@@ -20,8 +20,16 @@ import java.util.ResourceBundle;
 
 import de.tester.constants.messages.Messages;
 
+/**
+ * Test class.
+ */
 public class Tester {
 
+    /**
+     * Test Main.
+     * @param args command line args
+     * @throws IOException if getBundle fails
+     */
     public static void main(final String[] args) throws IOException {
 
         final ResourceBundle props = ResourceBundle.getBundle(Messages.BUNDLE_NAME);

@@ -29,7 +29,9 @@ class PropEntryTest {
         assertEquals("TEST_CASE", new PropEntry("test..case", "value").getConstantName());
         assertEquals("TEST_CASE", new PropEntry("test_case", "value").getConstantName());
         assertEquals("TEST_CASE", new PropEntry("test%case", "value").getConstantName());
+        assertEquals("TEST_CASE", new PropEntry("test%%%%%case", "value").getConstantName());
         assertEquals("TEST$CASE", new PropEntry("test$case", "value").getConstantName());
+        assertEquals("TEST$$$$CASE", new PropEntry("test$$$$case", "value").getConstantName());
         assertEquals("_0TEST", new PropEntry("0test", "value").getConstantName());
         assertEquals("TEST", new PropEntry("%test", "value").getConstantName());
     }
@@ -106,6 +108,13 @@ class PropEntryTest {
         assertEquals("TEST_CASE", entry.getConstantName());
         assertEquals("testCase", entry.getVariableName());
         assertEquals("getTestCase", entry.getGetterName());
+    }
+
+    @Test
+    void testJavadocStrings() {
+        PropEntry entry = new PropEntry("e@mail*/", "<b> &#64; * {@code hello} */");
+        assertEquals("e@mail&#42;/", entry.getJavadocKey());
+        assertEquals("&lt;b&gt; &amp;#64; * {&#64;code hello} &#42;/", entry.getJavadocValue());
     }
 
     @Test

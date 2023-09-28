@@ -1,6 +1,6 @@
 package de.r3s6.maven.constcreator;
 /*
- * Copyright 2021 Ralf Schandl
+ * Copyright 2023 Ralf Schandl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package de.r3s6.maven.constcreator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -26,147 +25,63 @@ import org.junit.jupiter.api.Test;
 
 class GeneratorRequestTest {
 
-    private static File IN = new File("input-dir");
-    private static File OUT = new File("output-dir");
-
     @Test
-    void testSimple() {
+    @SuppressWarnings("java:S5785")
+    void testHashCodeEquals() {
 
-        GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test.properties", false, "");
-        assertEquals("test.properties", gr.getPropertiesFileName());
-        assertEquals("test", gr.getBundleName());
-        assertEquals("pkg.Test", gr.getFullClassName());
-        assertEquals("pkg", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/Test.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
+        GeneratorRequest.Builder b = new GeneratorRequest.Builder();
+        b.className("a.b.JavaClass");
 
-        gr = new GeneratorRequest(IN, OUT, "pkg", "test-case.properties", false, "");
-        assertEquals("test-case.properties", gr.getPropertiesFileName());
-        assertEquals("test-case", gr.getBundleName());
-        assertEquals("pkg.TestCase", gr.getFullClassName());
-        assertEquals("pkg", gr.getPkgName());
-        assertEquals("TestCase", gr.getSimpleClassName());
-        assertEquals("pkg/TestCase.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test-case.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/TestCase.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
+        GeneratorRequest gr1 = b.build();
 
+        b.javaFileName("a/b/JavaClass.java");
+        b.javaFile(new File("a/b/JavaClass.java"));
+        b.propertiesFileName("a/b/javaClass.properties");
+        b.propertiesFile(new File("a/b/javaClass.properties"));
+        b.xmlProperties(false);
+        b.bundleName("a.b.javaClass");
+
+        GeneratorRequest gr2 = b.build();
+
+        assertEquals(gr1.hashCode(), gr2.hashCode());
+
+        assertTrue(gr1.equals(gr2));
+        assertTrue(gr2.equals(gr1));
+        assertTrue(gr1.equals(gr1));
     }
 
     @Test
-    void testSubdir() {
+    @SuppressWarnings("java:S5785")
+    void testNotEquals() {
 
-        final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", false, "");
-        assertEquals("test/test.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getBundleName());
-        assertEquals("pkg.test.Test", gr.getFullClassName());
-        assertEquals("pkg.test", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test/test.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
-    }
+        GeneratorRequest.Builder b = new GeneratorRequest.Builder();
+        b.className("a.b.JavaClass");
+        b.javaFileName("a/b/JavaClass.java");
+        b.javaFile(new File("a/b/JavaClass.java"));
+        b.propertiesFileName("a/b/javaClass.properties");
+        b.propertiesFile(new File("a/b/javaClass.properties"));
+        b.xmlProperties(false);
+        b.bundleName("a.b.javaClass");
 
-    @Test
-    void testSubdirFlatten() {
+        GeneratorRequest gr1 = b.build();
 
-        final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", true, "");
-        assertEquals("test/test.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getBundleName());
-        assertEquals("pkg.Test", gr.getFullClassName());
-        assertEquals("pkg", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test/test.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/Test.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
+        b.className("a.b.JavaClass2");
+        GeneratorRequest gr2 = b.build();
+
+        assertFalse(gr1.equals(gr2));
+        assertFalse(gr2.equals(gr1));
     }
 
     @Test
     @SuppressWarnings({ "unlikely-arg-type", "java:S5785" })
-    void testEquals() {
+    void testEqualsFalse() {
+        GeneratorRequest.Builder b = new GeneratorRequest.Builder();
+        b.className("a.b.Class");
 
-        final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.properties", true, "");
-        assertEquals("pkg.Test", gr.getFullClassName());
+        GeneratorRequest gr1 = b.build();
 
-        final GeneratorRequest gr2 = new GeneratorRequest(IN, OUT, "pkg", "test/sub/test.properties", true, "");
-        assertEquals("pkg.Test", gr2.getFullClassName());
-
-        // testing equals() here, so don't use assertEquals(), but call equal() directly
-
-        assertTrue(gr.equals(gr));
-        assertTrue(gr.equals(gr2));
-        assertTrue(gr2.equals(gr));
-
-        assertFalse(gr.equals(null));
-        assertFalse(gr.equals("pkg.Test"));
-
-        assertEquals(gr.hashCode(), gr2.hashCode());
-
-    }
-
-    @Test
-    void testLocale() {
-
-        GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test_en.properties", false, "");
-        assertEquals("test/test_en.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getBundleName());
-        assertEquals("pkg.test.Test", gr.getFullClassName());
-        assertEquals("pkg.test", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test/test_en.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
-
-        gr = new GeneratorRequest(IN, OUT, "pkg", "test/test_en_US.properties", false, "");
-        assertEquals("test/test_en_US.properties", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getBundleName());
-        assertEquals("pkg.test.Test", gr.getFullClassName());
-        assertEquals("pkg.test", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test/test_en_US.properties"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
-        assertFalse(gr.isXmlProperties());
-    }
-
-    @Test
-    void testXml() {
-
-        final GeneratorRequest gr = new GeneratorRequest(IN, OUT, "pkg", "test/test.xml", false, "");
-        assertEquals("test/test.xml", gr.getPropertiesFileName());
-        assertEquals("test/test", gr.getBundleName());
-        assertEquals("pkg.test.Test", gr.getFullClassName());
-        assertEquals("pkg.test", gr.getPkgName());
-        assertEquals("Test", gr.getSimpleClassName());
-        assertEquals("pkg/test/Test.java", gr.getJavaFileName());
-        assertEquals(new File("input-dir/test/test.xml"), gr.getPropertiesFile());
-        assertEquals(new File("output-dir/pkg/test/Test.java"), gr.getJavaFile());
-        assertTrue(gr.isXmlProperties());
-
-    }
-
-    @Test
-    void testInvalidConstruction() {
-
-        assertThrows(NullPointerException.class,
-                () -> new GeneratorRequest(null, OUT, "pkg", "test/test.xml", false, ""));
-        assertThrows(NullPointerException.class,
-                () -> new GeneratorRequest(IN, null, "pkg", "test/test.xml", false, ""));
-        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, null, "test/test.xml", false, ""));
-        assertThrows(NullPointerException.class, () -> new GeneratorRequest(IN, OUT, "pkg", null, false, ""));
-        assertThrows(NullPointerException.class,
-                () -> new GeneratorRequest(IN, OUT, "pkg", "test/test.xml", false, null));
-        assertThrows(IllegalArgumentException.class,
-                () -> new GeneratorRequest(IN, OUT, "", "test/test.xml", false, ""));
-        assertThrows(IllegalArgumentException.class,
-                () -> new GeneratorRequest(IN, OUT, "   ", "test/test.xml", false, ""));
-
+        assertFalse(gr1.equals(null));
+        assertFalse(gr1.equals("Not Me"));
     }
 
 }

@@ -84,15 +84,8 @@
                 Does the <code>properties-constants-maven-plugin</code> support XML properties?
             </question>
             <answer>
-                <p>Yes, if the configuration also includes <code>*.xml</code> files.</p>
-                <p>To include XML files use the configuration option <code>&lt;includes&gt;</code>
-                like:
-                </p>
-                <source><![CDATA[
-<includes>
-  <include>*.xml</include>
-</includes>]]></source>
-
+                <p>Yes, if the file name extension contains <code>xml</code> (case insensitive), the file
+                    is read as XML properties.</p>
                 <p> Note that the content must comply to the simple
                 <a href="http://java.sun.com/dtd/properties.dtd">Properties DTD</a>.
                 </p>
@@ -101,8 +94,8 @@
         <faq id="file.extensions">
             <question>Which file extensions are required?</question>
             <answer>
-                <p>The plugin only cares whether the file has the extension <code>xml</code> or not.
-                Files with the extension <code>xml</code> (case insensitive) are read as XML.
+                <p>The plugin only cares whether the file extension contains <code>xml</code> or not.
+                Files witch extension contain <code>xml</code> (case insensitive) are read as XML.
                 All other extensions are handled like <code>*.properties</code>.</p>
             </answer>
         </faq>

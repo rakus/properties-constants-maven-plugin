@@ -13,10 +13,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-package ${pkgName};
+package ${packageName};
 
 /**
- * Constants for ${propertiesFileName}
+ * Constants for ${propertiesFileName}.
  *
  * @author properties-constants-maven-plugin
  */
@@ -24,14 +24,14 @@ public final class ${simpleClassName} {
 <#list entries as entry>
 
     /**
-     * Key of ${entry.key}=${entry.value}
+     * Key of <code>${entry.javadocKey}=${entry.javadocValue}</code>.
      */
-    public final static String ${entry.constantName}_KEY = "${entry.key}";
+    public static final String ${entry.constantName}_KEY = "${entry.key}";
 
     /**
-     * Value of ${entry.key}=${entry.value}
+     * Value of <code>${entry.javadocKey}=${entry.javadocValue}</code>.
      */
-    public final static String ${entry.constantName}_VALUE = "${entry.value?j_string}";
+    public static final String ${entry.constantName}_VALUE = "${entry.value?j_string}";
 </#list>
 
     /** Hidden constructor. */

@@ -45,6 +45,11 @@ markers. The name of the constant can be changed with the option
 Typically `genPropertiesFilenameConstant` is set to `false` when
 `genBundleNameConstant` is `true`.
 
+**NOTE**: According to the JavaDoc of `java.util.ResourceBundle`, the bundle name
+should be a valid class name. The plugin does not validate the generated bundle
+name, so it might be an invalid class name. On the other hand, `ResourceBundle`
+seems be able to load resource bundles from files that are not valid class names.
+
 #### `bundleNameConstant`
 String, Default: `BUNDLE_NAME`
 
@@ -92,7 +97,7 @@ start with a ftl directive defining the character encoding. Like:
 
 The model used for Freemarker templates contain the following fields:
 
-* `pkgName`: the java package name of the generated class
+* `packageName`: the java package name of the generated class
 * `simpleClassName`: The name of the generated class without package
 * `fullClassName`: the fully qualified class name including package
 * `javaFileName`: Name of the generated Java file including the directories
@@ -100,7 +105,7 @@ The model used for Freemarker templates contain the following fields:
 * `propertiesFileName`: name of the properties file relative to the
   `<resourceDir>`
 * `bundleName`: Like `propertiesFileName` but without extension and locale
-  marker.
+  marker and dots instead of slashes as separator.
 * `isXmlProperties`: Whether the properties file is a XML file.
 * `properties`: Properties read from the properties file.
 * `entries`: List of entries to create constants. See below.
@@ -121,20 +126,24 @@ constant should be created. It contains the following field:
 
 * `key`: The key from the properties file entry.
 * `value`: The value from the properties file entry.
-* `constantName`: Name suitable for a Java constant derived from `key`.
-* `variableName`: Name suitable for a Java variable derived from `key`.
-* `getterName`: Name suitable for a getter method derived from `key`.
+* `javadocKey`: The key escaped for use in a javadoc comment.
+* `javadocValue`: The value escaped for use in a javadoc comment.
+* `constantName`: Name derived from `key` suitable for a Java constant.
+* `variableName`: Name derived from `key` suitable for a Java variable.
+* `getterName`: Name derived from `key` suitable for a getter method.
 
 Example: For the following line of in the properties file:
 
 ```
-welcome.message=Hello there
+welcome.message=Hello <b>there</b>
 ```
 
 The following Entry would be created:
 
 * `key`: `welcome.message`
-* `value`: `Hello there`
+* `value`: `Hello <b>there</b>`
+* `javadocKey`: `welcome.message`
+* `javadocValue`: `Hello &lt;b&gt;there&lt;/b&gt;`
 * `constantName`: `WELCOME_MESSAGE`
 * `variableName`: `welcomeMessage`
 * `getterName`: `getWelcomeMessage`
@@ -160,7 +169,7 @@ Important: This are both of type `String`.
 
 __Using Options as Booleans__
 
-Strings they can't be directly used as a Boolean. Also it has to be handled
+Strings can't be directly used as a Boolean. Also it has to be handled
 that they might be unset (aka `null`).  The simplest way is to define a boolean
 variable in the context of the template:
 

@@ -13,10 +13,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-package ${pkgName};
+package ${packageName};
 
 /**
- * Constants for ${propertiesFileName}
+ * Constants for ${propertiesFileName}.
  * <p>
  * The constant values are the values of the properties.
  *
@@ -26,9 +26,9 @@ public final class ${simpleClassName} {
 <#list entries as entry>
 
     /**
-     * Value of ${entry.key}=${entry.value}
+     * Value of <code>${entry.javadocKey}=${entry.javadocValue}</code>.
      */
-    public final static String ${entry.constantName} = "${entry.value?j_string}";
+    public static final String ${entry.constantName} = "${entry.value?j_string}";
 
 /// MISSING END OF LIST
 

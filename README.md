@@ -46,21 +46,18 @@ public final class Messages {
 
     /**
      * Properties file used to generate this class: "messages.properties".
-     * <p>
-     * If this name should be used to load the properties via classpath,
-     * a leading slash ('/') might be needed.
      */
-    public final static String PROPERTIES_FILE_NAME = "messages.properties";
+    public static final String PROPERTIES_FILE_NAME = "messages.properties";
 
     /**
      * Key of welcome.user=Hello user
      */
-    public final static String WELCOME_USER = "welcome.user";
+    public static final String WELCOME_USER = "welcome.user";
 
     /**
      * Key of goodby.user=Have a nice day
      */
-    public final static String GOODBY_USER = "goodby.user";
+    public static final String GOODBY_USER = "goodby.user";
 
     /** Hidden constructor. */
     private Messages() {

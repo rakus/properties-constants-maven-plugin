@@ -34,7 +34,7 @@ class MessagesTest {
 
     @Test
     void testPropertiesFilenameName() {
-        assertEquals("messages/messages", Messages.BUNDLE_NAME);
+        assertEquals("messages.messages", Messages.BUNDLE_NAME);
     }
 
     @Test

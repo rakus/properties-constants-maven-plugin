@@ -43,17 +43,17 @@ public final class Messages {
     /**
      * Properties file used to generate this class: "messages.properties".
      */
-    public final static String PROPERTIES_FILE_NAME = "messages.properties";
+    public static final String PROPERTIES_FILE_NAME = "messages.properties";
 
     /**
      * Key of welcome=Welcome to Maven
      */
-    public final static String WELCOME = "welcome";
+    public static final String WELCOME = "welcome";
 
     /**
      * Key of goodby=See you next time
      */
-    public final static String GOODBY = "goodby";
+    public static final String GOODBY = "goodby";
 
     /** Hidden constructor. */
     private Messages() {
@@ -76,12 +76,12 @@ public final class Messages {
     /**
      * Value of welcome=Welcome to Maven
      */
-    public final static String WELCOME = "Welcome to Maven";
+    public static final String WELCOME = "Welcome to Maven";
 
     /**
      * Value of goodby=See you next time
      */
-    public final static String GOODBY = "See you next time";
+    public static final String GOODBY = "See you next time";
 
     /** Hidden constructor. */
     private Messages() {
@@ -93,7 +93,7 @@ public final class Messages {
 $H2 Properties Source Files
 
 The plugin supports traditional `*.properties` files and XML
-properties. If the file extension is `.xml` (case insensitive) it
+properties. If the file extension contains `xml` (case insensitive) it
 is read as XML file, all other extensions are handled like a `*.properties`.
 
 
@@ -120,11 +120,14 @@ __Examples__
 | `test$case`   | `TEST$CASE`   |
 | `0test`       | `_0TEST`      |
 | `%test`       | `TEST`        |
+| `.`           | `_`           |
+| `..`          | `__`          |
+| `%%%`         | `___`         |
 
-__Recommendations__
+Also this plugin should be able to handle any properties keys, it is not
+guaranteed to create unique constant names.
 
-Also this plugin should be able to handle any properties keys,
-it works best if the keys ...
+It works best if the keys ...
 
 * only contain ASCII characters, digits and the separators dot, underscore and dash (aka minus-sign).
 * start with a ASCII character.
