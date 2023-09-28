@@ -126,20 +126,24 @@ constant should be created. It contains the following field:
 
 * `key`: The key from the properties file entry.
 * `value`: The value from the properties file entry.
-* `constantName`: Name suitable for a Java constant derived from `key`.
-* `variableName`: Name suitable for a Java variable derived from `key`.
-* `getterName`: Name suitable for a getter method derived from `key`.
+* `javadocKey`: The key escaped for use in a javadoc comment.
+* `javadocValue`: The value escaped for use in a javadoc comment.
+* `constantName`: Name derived from `key` suitable for a Java constant.
+* `variableName`: Name derived from `key` suitable for a Java variable.
+* `getterName`: Name derived from `key` suitable for a getter method.
 
 Example: For the following line of in the properties file:
 
 ```
-welcome.message=Hello there
+welcome.message=Hello <b>there</b>
 ```
 
 The following Entry would be created:
 
 * `key`: `welcome.message`
-* `value`: `Hello there`
+* `value`: `Hello <b>there</b>`
+* `javadocKey`: `welcome.message`
+* `javadocValue`: `Hello &lt;b&gt;there&lt;/b&gt;`
 * `constantName`: `WELCOME_MESSAGE`
 * `variableName`: `welcomeMessage`
 * `getterName`: `getWelcomeMessage`
@@ -165,7 +169,7 @@ Important: This are both of type `String`.
 
 __Using Options as Booleans__
 
-Strings they can't be directly used as a Boolean. Also it has to be handled
+Strings can't be directly used as a Boolean. Also it has to be handled
 that they might be unset (aka `null`).  The simplest way is to define a boolean
 variable in the context of the template:
 

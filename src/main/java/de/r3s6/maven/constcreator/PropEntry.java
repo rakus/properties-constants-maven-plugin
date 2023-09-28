@@ -24,6 +24,8 @@ import de.r3s6.maven.constcreator.NameHandler.JavaNames;
  * <p>
  * An instance of this class holds the key and value from the properties file
  * and additional the generated constant, variable and getter name.
+ * <p>
+ * Also escaped key and value for javadoc are available.
  *
  * @author Ralf Schandl
  */
@@ -31,6 +33,9 @@ public class PropEntry {
 
     private final String key;
     private final String value;
+
+    private final String javadocKey;
+    private final String javadocValue;
 
     private final String constantName;
     private final String variableName;
@@ -54,10 +59,23 @@ public class PropEntry {
         }
         this.value = value;
 
+        this.javadocKey = escapeJavadoc(this.key);
+        this.javadocValue = escapeJavadoc(this.value);
+
         final JavaNames names = NameHandler.createJavaNames(key);
         constantName = names.getConstantName();
         variableName = names.getVariableName();
-        getterName =   names.getGetterName();
+        getterName = names.getGetterName();
+    }
+
+    private String escapeJavadoc(final String text) {
+        // @formatter:off
+        return text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("{@", "{&#64;")
+                .replace("*/", "&#42;/");
+        // @formatter:on
     }
 
     public String getConstantName() {
@@ -78,5 +96,13 @@ public class PropEntry {
 
     public String getValue() {
         return value;
+    }
+
+    public String getJavadocKey() {
+        return javadocKey;
+    }
+
+    public String getJavadocValue() {
+        return javadocValue;
     }
 }

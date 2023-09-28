@@ -21,7 +21,7 @@
 package ${packageName};
 
 /**
- * Constants for ${propertiesFileName}
+ * Constants for ${propertiesFileName}.
  * <p>
  * The constant values are the keys to access the properties.
  *
@@ -38,14 +38,14 @@ public final class ${simpleClassName} {
 <#if genBundleNameConstant>
 
     /**
-     * ResourceBundle used to generate this class: "${bundleName}"
+     * ResourceBundle used to generate this class: "${bundleName}".
      */
     public static final String ${bundleNameConstant} = "${bundleName}";
 </#if>
 <#list entries as entry>
 
     /**
-     * Key of ${entry.key}=${entry.value}
+     * Key of <code>${entry.javadocKey}=${entry.javadocValue}</code>.
      */
     public static final String ${entry.constantName} = "${entry.key}";
 </#list>

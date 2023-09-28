@@ -111,6 +111,13 @@ class PropEntryTest {
     }
 
     @Test
+    void testJavadocStrings() {
+        PropEntry entry = new PropEntry("e@mail*/", "<b> &#64; * {@code hello} */");
+        assertEquals("e@mail&#42;/", entry.getJavadocKey());
+        assertEquals("&lt;b&gt; &amp;#64; * {&#64;code hello} &#42;/", entry.getJavadocValue());
+    }
+
+    @Test
     void testEmptyKeyException() {
         InvalidPropertyKeyException thr = assertThrows(InvalidPropertyKeyException.class,
                 () -> new PropEntry("", "one"));
